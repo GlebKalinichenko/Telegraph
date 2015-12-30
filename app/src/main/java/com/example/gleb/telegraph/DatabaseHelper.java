@@ -13,88 +13,88 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "Telegraph.db";
 
     /** Table MailBoxes*/
-    private static final String TABLE_MAIL_BOXES = "MailBoxes";
-    private static final String ID_MAIL_BOX = "IdMailBox";
-    private static final String EMAIL_ACCOUNT = "Email";
-    private static final String PASSWORD_ACCOUNT = "Password";
+    public static final String TABLE_MAIL_BOXES = "MailBoxes";
+    public static final String ID_MAIL_BOX = "IdMailBox";
+    public static final String EMAIL_ACCOUNT = "Email";
+    public static final String PASSWORD_ACCOUNT = "Password";
 
     /**Table Settings*/
-    private static final String TABLE_SETTINGS = "Settings";
-    private static final String ID_SETTING = "IdSetting";
-    private static final String BOX_CODE = "BoxCode";
-    private static final String MAIL_SETTING_CODE = "MailSettingCode";
+    public static final String TABLE_SETTINGS = "Settings";
+    public static final String ID_SETTING = "IdSetting";
+    public static final String BOX_CODE = "BoxCode";
+    public static final String MAIL_SETTING_CODE = "MailSettingCode";
 
     /**Table MailSettings*/
-    private static final String TABLE_MAIL_SETTINGS = "MailSettings";
-    private static final String ID_MAIL_SETTING = "IdMailSetting";
-    private static final String NAME_POST_SERVER = "Name post server";
-    private static final String ADDRESS_IMAP = "Address imap";
-    private static final String PORT_IMAP = "Port imap";
-    private static final String ADDRESS_POP3 = "Address pop3";
-    private static final String PORT_POP3 = "Port pop3";
+    public static final String TABLE_MAIL_SETTINGS = "MailSettings";
+    public static final String ID_MAIL_SETTING = "IdMailSetting";
+    public static final String NAME_POST_SERVER = "Name post server";
+    public static final String ADDRESS_IMAP = "Address imap";
+    public static final String PORT_IMAP = "Port imap";
+    public static final String ADDRESS_POP3 = "Address pop3";
+    public static final String PORT_POP3 = "Port pop3";
 
     /**Table Folders*/
-    private static final String TABLE_FOLDERS = "Folders";
-    private static final String ID_FOLDER = "IdFolder";
-    private static final String NAME_FOLDER = "Name folder";
-    private static final String MAIL_BOX_CODE = "MailBoxCode";
+    public static final String TABLE_FOLDERS = "Folders";
+    public static final String ID_FOLDER = "IdFolder";
+    public static final String NAME_FOLDER = "Name folder";
+    public static final String MAIL_BOX_CODE = "MailBoxCode";
 
     /**Table Mails*/
-    private static final String TABLE_MAILS = "Mails";
-    private static final String ID_MAIL = "IdMail";
-    private static final String SENDER = "Sender";
-    private static final String USER_CODE = "UserCode";
-    private static final String SUBJECT = "Subject";
-    private static final String CONTENT = "Content";
-    private static final String FOLDER_CODE = "FolderCode";
-    private static final String DATE = "Date";
-    private static final String HAS_ATTACH = "HasAttach";
+    public static final String TABLE_MAILS = "Mails";
+    public static final String ID_MAIL = "IdMail";
+    public static final String SENDER = "Sender";
+    public static final String USER_CODE = "UserCode";
+    public static final String SUBJECT = "Subject";
+    public static final String CONTENT = "Content";
+    public static final String FOLDER_CODE = "FolderCode";
+    public static final String DATE = "Date";
+    public static final String HAS_ATTACH = "HasAttach";
 
     /**Table Attachs*/
-    private static final String TABLE_ATTACHS = "Attachs";
-    private static final String ID_ATTACH = "IdAttach";
-    private static final String NAME_ATTACH = "Name attach";
-    private static final String NUM_POSITION = "Num posiiton of attach";
-    private static final String MAIL_CODE = "MailCode";
+    public static final String TABLE_ATTACHS = "Attachs";
+    public static final String ID_ATTACH = "IdAttach";
+    public static final String NAME_ATTACH = "Name attach";
+    public static final String NUM_POSITION = "Num posiiton of attach";
+    public static final String MAIL_CODE = "MailCode";
 
     /**Table Users*/
-    private static final String TABLE_USERS = "Users";
-    private static final String ID_USER = "IdUser";
-    private static final String EMAIL_USER = "Email";
+    public static final String TABLE_USERS = "Users";
+    public static final String ID_USER = "IdUser";
+    public static final String EMAIL_USER = "Email";
 
     /**Table User keys*/
-    private static final String TABLE_USER_KEYS = "User keys";
-    private static final String ID_USER_KEY = "IdUserKey";
-    private static final String LINK_TO_USER_KEY_FOLDER = "Link to folder";
+    public static final String TABLE_USER_KEYS = "User keys";
+    public static final String ID_USER_KEY = "IdUserKey";
+    public static final String LINK_TO_USER_KEY_FOLDER = "Link to folder";
 
     /**Table User signature*/
-    private static final String TABLE_USER_SIGNATURES = "User signatures";
-    private static final String ID_USER_SIGNATURE = "IdUserSignature";
-    private static final String LINK_TO_USER_SIGNATURE_FOLDER = "Link to folder";
+    public static final String TABLE_USER_SIGNATURES = "User signatures";
+    public static final String ID_USER_SIGNATURE = "IdUserSignature";
+    public static final String LINK_TO_USER_SIGNATURE_FOLDER = "Link to folder";
 
     /**Table My users*/
-    private static final String TABLE_MY_USERS = "My users";
-    private static final String ID_MY_USER = "IdUser";
-    private static final String EMAIL_MY_USER = "Email";
-    private static final String BOX_CODE_MY_USER = "BoxCode";
+    public static final String TABLE_MY_USERS = "My users";
+    public static final String ID_MY_USER = "IdUser";
+    public static final String EMAIL_MY_USER = "Email";
+    public static final String BOX_CODE_MY_USER = "BoxCode";
 
     /**Table MailBox signatures*/
-    private static final String TABLE_MAILBOX_SIGNATURES = "MailBox signatures";
-    private static final String ID_MAILBOX_SIGNATURE = "IdSignature";
-    private static final String LINK_TO_MAILBOX_SIGNATURE_FOLDER = "Link to folder";
-    private static final String MY_SIGNATURE_USER_CODE = "UserCode";
+    public static final String TABLE_MAILBOX_SIGNATURES = "MailBox signatures";
+    public static final String ID_MAILBOX_SIGNATURE = "IdSignature";
+    public static final String LINK_TO_MAILBOX_SIGNATURE_FOLDER = "Link to folder";
+    public static final String MY_SIGNATURE_USER_CODE = "UserCode";
 
     /**Table MailBox keys*/
-    private static final String TABLE_MAILBOX_KEYS = "MailBox keys";
-    private static final String ID_MAILBOX_KEY = "IdKey";
-    private static final String LINK_TO_MAILBOX_KEY_FOLDER = "Link to folder";
-    private static final String MY_KEY_USER_CODE = "UserCode";
-    private static final String TYPE_KEY_CODE = "TypeKeyCode";
+    public static final String TABLE_MAILBOX_KEYS = "MailBox keys";
+    public static final String ID_MAILBOX_KEY = "IdKey";
+    public static final String LINK_TO_MAILBOX_KEY_FOLDER = "Link to folder";
+    public static final String MY_KEY_USER_CODE = "UserCode";
+    public static final String TYPE_KEY_CODE = "TypeKeyCode";
 
     /**Table Type keys*/
-    private static final String TABLE_TYPE_KEYS = "Type keys";
-    private static final String ID_TYPE_KEY = "IdTypeKey";
-    private static final String TYPE_KEY = "TypeKey";
+    public static final String TABLE_TYPE_KEYS = "Type keys";
+    public static final String ID_TYPE_KEY = "IdTypeKey";
+    public static final String TYPE_KEY = "TypeKey";
 
     public static final String CREATE_MAIL_BOXES = "CREATE TABLE " + TABLE_MAIL_BOXES + " (" +
             ID_MAIL_BOX + " INTEGER PRIMARY KEY, " + EMAIL_ACCOUNT + " TEXT," + PASSWORD_ACCOUNT +
@@ -173,6 +173,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("PRAGMA foreign_keys=ON;");
         db.execSQL(CREATE_MAIL_BOXES);
+        db.execSQL(CREATE_SETTINGS);
+        db.execSQL(CREATE_MAIL_SETTINGS);
+        db.execSQL(CREATE_FOLDERS);
+        db.execSQL(CREATE_MAILS);
+        db.execSQL(CREATE_USERS);
+        db.execSQL(CREATE_ATTACHS);
+        db.execSQL(CREATE_USER_KEYS);
+        db.execSQL(CREATE_USERS_SIGNATURES);
+        db.execSQL(CREATE_MY_USERS);
+        db.execSQL(CREATE_MAILBOX_KEYS);
+        db.execSQL(CREATE_MAILBOX_SIGNATURES);
+        db.execSQL(CREATE_TYPE_KEYS);
     }
 
     @Override
