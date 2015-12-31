@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.gleb.telegraph.models.MailBox;
+import com.example.gleb.telegraph.models.MailSettings;
 
 public class SignInActivity extends AppCompatActivity {
     public static final String TAG = "Tag";
@@ -46,16 +47,24 @@ public class SignInActivity extends AppCompatActivity {
                 sdb.close();
 
                 SQLiteDatabase db = databaseHelper.getReadableDatabase();
-                Cursor cursor = db.query(DatabaseHelper.TABLE_MAIL_BOXES,
-                        new String[]{DatabaseHelper.EMAIL_ACCOUNT, DatabaseHelper.PASSWORD_ACCOUNT}, null, null, null, null, null);
+                String namePost = MailBox.parseEmail(emailEditText.getText().toString());
 
-                if (cursor != null){
-                    cursor.moveToFirst();
-                }
-
-//                MailBox mailBox = new MailBox(cursor.getString(0), cursor.getString(1));
-//                Log.d(TAG, mailBox.getEmail());
-//                Log.d(TAG, mailBox.getPassword());
+//                SQLiteDatabase db = databaseHelper.getReadableDatabase();
+//                Cursor cursor = db.query(DatabaseHelper.TABLE_MAIL_SETTINGS,
+//                        new String[]{DatabaseHelper.NAME_POST_SERVER, DatabaseHelper.ADDRESS_IMAP,
+//                        DatabaseHelper.PORT_IMAP, DatabaseHelper.ADDRESS_POP3,
+//                        DatabaseHelper.PORT_POP3, DatabaseHelper.ADDRESS_SMTP,
+//                        DatabaseHelper.PORT_SMTP,}, null, null, null, null, null);
+//
+//                if (cursor != null){
+//                    cursor.moveToFirst();
+//                }
+//
+//                MailSettings mailSettings = new MailSettings(cursor.getString(0), cursor.getString(1),
+//                        cursor.getString(2), cursor.getString(3), cursor.getString(4),
+//                        cursor.getString(5), cursor.getString(6));
+//                Log.d(TAG, mailSettings.getNamePostServer());
+//                Log.d(TAG, mailSettings.getAddressImap());
             }
         });
 //        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
