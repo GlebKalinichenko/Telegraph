@@ -39,6 +39,7 @@ public class SignInActivity extends AppCompatActivity {
     private Button signInButton;
     private EditText emailEditText;
     private EditText passwordEditText;
+    private DatabaseHelper databaseHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +53,7 @@ public class SignInActivity extends AppCompatActivity {
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DatabaseHelper databaseHelper = new DatabaseHelper(SignInActivity.this);
+                databaseHelper = new DatabaseHelper(SignInActivity.this);
                 SQLiteDatabase sdb = databaseHelper.getWritableDatabase();
 
                 ContentValues values = new ContentValues();
@@ -152,7 +153,8 @@ public class SignInActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(MailSettings mailSettings) {
-
+            SQLiteDatabase sdb = databaseHelper.getWritableDatabase();
+            mailSettings.addSettings(sdb);
         }
     }
 }
