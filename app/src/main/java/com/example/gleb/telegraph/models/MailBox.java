@@ -1,5 +1,10 @@
 package com.example.gleb.telegraph.models;
 
+import android.content.ContentValues;
+import android.database.sqlite.SQLiteDatabase;
+
+import com.example.gleb.telegraph.DatabaseHelper;
+
 /**
  * Created by Gleb on 30.12.2015.
  */
@@ -19,9 +24,21 @@ public class MailBox {
      * */
     public static String parseEmail(String email){
         int beginChar = email.indexOf("@") + 1;
-//        int endChar = email.indexOf(".");
         email = email.substring(beginChar);
         return email;
+    }
+
+    /**
+     * Add account information to database
+     * @param SQLiteDatabase        Database
+     * @return void
+     * */
+    public void addAccount(SQLiteDatabase sdb){
+        ContentValues values = new ContentValues();
+        values.put(DatabaseHelper.EMAIL_ACCOUNT, this.email);
+        values.put(DatabaseHelper.PASSWORD_ACCOUNT, this.password);
+        sdb.insert(DatabaseHelper.TABLE_MAIL_BOXES, null, values);
+        sdb.close();
     }
 
     public String getEmail() {
