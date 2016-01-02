@@ -10,6 +10,13 @@ import com.example.gleb.telegraph.DatabaseHelper;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
+import java.util.Properties;
+
+import javax.mail.MessagingException;
+import javax.mail.NoSuchProviderException;
+import javax.mail.Session;
+import javax.mail.Store;
+
 /**
  * Created by Gleb on 30.12.2015.
  */
@@ -54,6 +61,38 @@ public class MailSettings {
     }
 
     /**
+     * Authentication on post server
+     * @param String        Email of account
+     * @param String        Password of account
+     * @return boolean      Is authentication complete
+     * */
+    public boolean authentication(String email, String password){
+        Properties props = new Properties();
+        props.put("mail.imap.port", this.portImap);
+        props.put("mail.imap.socketFactory.port", this.portImap);
+        props.put("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+        props.put("mail.imap.socketFactory.fallback", "false");
+        props.setProperty("mail.store.protocol", "imaps");
+
+        Session session = Session.getInstance(props, null);
+        Store store = null;
+        try {
+            store = session.getStore();
+        } catch (NoSuchProviderException e) {
+            e.printStackTrace();
+            return false;
+        }
+        try {
+            store.connect(this.addressImap, email, password);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Add settings to database
      * @param SQLiteDatabase        Database
      * @return void
@@ -67,7 +106,6 @@ public class MailSettings {
         values.put(DatabaseHelper.PORT_POP3, this.portPop3);
         values.put(DatabaseHelper.ADDRESS_SMTP, this.addressSmtp);
         values.put(DatabaseHelper.PORT_SMTP, this.portSmtp);
-
         sdb.insert(DatabaseHelper.TABLE_MAIL_SETTINGS, null, values);
         sdb.close();
     }
