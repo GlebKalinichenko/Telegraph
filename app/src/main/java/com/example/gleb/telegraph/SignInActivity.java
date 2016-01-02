@@ -3,6 +3,7 @@ package com.example.gleb.telegraph;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -17,6 +18,21 @@ import android.widget.EditText;
 
 import com.example.gleb.telegraph.models.MailBox;
 import com.example.gleb.telegraph.models.MailSettings;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 public class SignInActivity extends AppCompatActivity {
     public static final String TAG = "Tag";
@@ -48,6 +64,8 @@ public class SignInActivity extends AppCompatActivity {
 
                 SQLiteDatabase db = databaseHelper.getReadableDatabase();
                 String namePost = MailBox.parseEmail(emailEditText.getText().toString());
+
+                new Loader(namePost).execute();
 
 //                SQLiteDatabase db = databaseHelper.getReadableDatabase();
 //                Cursor cursor = db.query(DatabaseHelper.TABLE_MAIL_SETTINGS,
@@ -100,5 +118,41 @@ public class SignInActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public class Loader extends AsyncTask<Void, Void, MailSettings> {
+        private String urlServer;
+
+        public Loader(String urlServer) {
+            this.urlServer = urlServer;
+        }
+
+        @Override
+        protected MailSettings doInBackground(Void... params) {
+            URL url = null;
+            Document doc = null;
+            DocumentBuilder d = null;
+            try {
+                url = new URL("https://autoconfig.thunderbird.net/v1.1/" + urlServer);
+                DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                d = dbf.newDocumentBuilder();
+                doc = d.parse(new InputSource(url.openStream()));
+            } catch (SAXException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ParserConfigurationException e) {
+                e.printStackTrace();
+            }
+
+            return MailSettings.newInstance(urlServer, doc);
+        }
+
+        @Override
+        protected void onPostExecute(MailSettings mailSettings) {
+
+        }
     }
 }
