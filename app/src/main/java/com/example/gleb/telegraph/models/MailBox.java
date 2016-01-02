@@ -19,8 +19,8 @@ public class MailBox {
      * */
     public static String parseEmail(String email){
         int beginChar = email.indexOf("@") + 1;
-        int endChar = email.indexOf(".");
-        email = email.substring(beginChar, endChar);
+//        int endChar = email.indexOf(".");
+        email = email.substring(beginChar);
         return email;
     }
 
