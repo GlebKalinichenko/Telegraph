@@ -1,28 +1,20 @@
 package com.example.gleb.telegraph;
 
-import android.content.ContentValues;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.gleb.telegraph.models.MailBox;
 import com.example.gleb.telegraph.models.MailSettings;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -54,19 +46,15 @@ public class SignInActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 databaseHelper = new DatabaseHelper(SignInActivity.this);
+                MailBox mailBox = new MailBox(emailEditText.getText().toString(),
+                        passwordEditText.getText().toString());
                 SQLiteDatabase sdb = databaseHelper.getWritableDatabase();
+                mailBox.addAccount(sdb);
 
-                ContentValues values = new ContentValues();
-                values.put(DatabaseHelper.EMAIL_ACCOUNT, emailEditText.getText().toString());
-                values.put(DatabaseHelper.PASSWORD_ACCOUNT, passwordEditText.getText().toString());
-
-                sdb.insert(DatabaseHelper.TABLE_MAIL_BOXES, null, values);
-                sdb.close();
-
-                SQLiteDatabase db = databaseHelper.getReadableDatabase();
+                //SQLiteDatabase db = databaseHelper.getReadableDatabase();
                 String namePost = MailBox.parseEmail(emailEditText.getText().toString());
-
-                new Loader(namePost).execute();
+                new Loader(namePost, emailEditText.getText().toString(),
+                        passwordEditText.getText().toString()).execute();
 
 //                SQLiteDatabase db = databaseHelper.getReadableDatabase();
 //                Cursor cursor = db.query(DatabaseHelper.TABLE_MAIL_SETTINGS,
@@ -121,15 +109,19 @@ public class SignInActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public class Loader extends AsyncTask<Void, Void, MailSettings> {
+    public class Loader extends AsyncTask<Void, Void, Boolean> {
         private String urlServer;
+        private String email;
+        private String password;
 
-        public Loader(String urlServer) {
+        public Loader(String urlServer, String email, String password) {
             this.urlServer = urlServer;
+            this.email = email;
+            this.password = password;
         }
 
         @Override
-        protected MailSettings doInBackground(Void... params) {
+        protected Boolean doInBackground(Void... params) {
             URL url = null;
             Document doc = null;
             DocumentBuilder d = null;
@@ -147,14 +139,18 @@ public class SignInActivity extends AppCompatActivity {
             } catch (ParserConfigurationException e) {
                 e.printStackTrace();
             }
+            MailSettings mailSettings = MailSettings.newInstance(urlServer, doc);
+            SQLiteDatabase sdb = databaseHelper.getWritableDatabase();
+            mailSettings.addSettings(sdb);
 
-            return MailSettings.newInstance(urlServer, doc);
+            return mailSettings.authentication(email, password);
         }
 
         @Override
-        protected void onPostExecute(MailSettings mailSettings) {
-            SQLiteDatabase sdb = databaseHelper.getWritableDatabase();
-            mailSettings.addSettings(sdb);
+        protected void onPostExecute(Boolean params) {
+            if (!params){
+                Toast.makeText(getApplicationContext(), "No athentification", Toast.LENGTH_LONG).show();
+            }
         }
     }
 }
