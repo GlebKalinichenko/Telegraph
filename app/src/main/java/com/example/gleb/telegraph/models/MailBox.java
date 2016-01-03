@@ -1,6 +1,7 @@
 package com.example.gleb.telegraph.models;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.example.gleb.telegraph.DatabaseHelper;
@@ -38,7 +39,19 @@ public class MailBox {
         values.put(DatabaseHelper.EMAIL_ACCOUNT, this.email);
         values.put(DatabaseHelper.PASSWORD_ACCOUNT, this.password);
         sdb.insert(DatabaseHelper.TABLE_MAIL_BOXES, null, values);
-        sdb.close();
+    }
+
+    /**
+     * Get last inserted index in table mail box
+     * @param SQLiteDatabase        Database
+     * @return int                  Last inserted index
+     * */
+    public int getLastAccount(SQLiteDatabase sdb){
+        String query = "SELECT last_insert_rowid()";
+        Cursor cursor = sdb.rawQuery(query, null);
+        cursor.moveToLast();
+        int boxCode = cursor.getInt(0);
+        return boxCode;
     }
 
     public String getEmail() {
