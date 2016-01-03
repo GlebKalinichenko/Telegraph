@@ -1,5 +1,6 @@
 package com.example.gleb.telegraph;
 
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import com.example.gleb.telegraph.models.MailBox;
 import com.example.gleb.telegraph.models.MailSettings;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -46,10 +48,6 @@ public class SignInActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 databaseHelper = new DatabaseHelper(SignInActivity.this);
-                MailBox mailBox = new MailBox(emailEditText.getText().toString(),
-                        passwordEditText.getText().toString());
-                SQLiteDatabase sdb = databaseHelper.getWritableDatabase();
-                mailBox.addAccount(sdb);
 
                 //SQLiteDatabase db = databaseHelper.getReadableDatabase();
                 String namePost = MailBox.parseEmail(emailEditText.getText().toString());
@@ -139,11 +137,23 @@ public class SignInActivity extends AppCompatActivity {
             } catch (ParserConfigurationException e) {
                 e.printStackTrace();
             }
-            MailSettings mailSettings = MailSettings.newInstance(urlServer, doc);
-            SQLiteDatabase sdb = databaseHelper.getWritableDatabase();
-            mailSettings.addSettings(sdb);
 
-            return mailSettings.authentication(email, password);
+            MailSettings mailSettings = MailSettings.newInstance(urlServer, doc);
+            boolean isAuthentication = mailSettings.authentication(email, password, true);
+            if (isAuthentication){
+                SQLiteDatabase sdb = databaseHelper.getWritableDatabase();
+                MailBox mailBox = new MailBox(email, password);
+                //add information about account to database
+                mailBox.addAccount(sdb);
+                //get last id of account
+                SQLiteDatabase db = databaseHelper.getReadableDatabase();
+                //add mail settings to database
+                mailSettings.addSettings(sdb, mailBox.getLastAccount(db));
+                db.close();
+                sdb.close();
+            }
+
+            return isAuthentication;
         }
 
         @Override
