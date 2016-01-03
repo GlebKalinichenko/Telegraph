@@ -29,6 +29,16 @@ public class MailSettings {
     private String addressSmtp;
     private String portSmtp;
 
+    public MailSettings(String namePostServer, String addressImap, String portImap, String addressPop3, String portPop3, String addressSmtp, String portSmtp) {
+        this.namePostServer = namePostServer;
+        this.addressImap = addressImap;
+        this.portImap = portImap;
+        this.addressPop3 = addressPop3;
+        this.portPop3 = portPop3;
+        this.addressSmtp = addressSmtp;
+        this.portSmtp = portSmtp;
+    }
+
     /**
      * Parse settings from api in format xml and create settings
      * @param String            Url address of server
@@ -48,14 +58,8 @@ public class MailSettings {
         String pop3Port = portList.item(1).getFirstChild().getNodeValue();
         String smtpPort = portList.item(2).getFirstChild().getNodeValue();
 
-        MailSettings mailSettings = new MailSettings();
-        mailSettings.setNamePostServer(urlServer);
-        mailSettings.setAddressImap(imapHost);
-        mailSettings.setPortImap(imapPort);
-        mailSettings.setAddressPop3(pop3Host);
-        mailSettings.setPortPop3(pop3Port);
-        mailSettings.setAddressSmtp(smtpHost);
-        mailSettings.setPortSmtp(smtpPort);
+        MailSettings mailSettings = new MailSettings(urlServer, imapHost, imapPort, pop3Host,
+                pop3Port, smtpHost, smtpPort);
 
         return mailSettings;
     }
@@ -66,13 +70,22 @@ public class MailSettings {
      * @param String        Password of account
      * @return boolean      Is authentication complete
      * */
-    public boolean authentication(String email, String password){
+    public boolean authentication(String email, String password, boolean isImap){
         Properties props = new Properties();
-        props.put("mail.imap.port", this.portImap);
-        props.put("mail.imap.socketFactory.port", this.portImap);
-        props.put("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-        props.put("mail.imap.socketFactory.fallback", "false");
-        props.setProperty("mail.store.protocol", "imaps");
+        if (isImap) {
+            props.put("mail.imap.port", this.portImap);
+            props.put("mail.imap.socketFactory.port", this.portImap);
+            props.put("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+            props.put("mail.imap.socketFactory.fallback", "false");
+            props.setProperty("mail.store.protocol", "imaps");
+        }
+        else{
+            props.put("mail.pop3.port", this.portPop3);
+            props.put("mail.pop3.socketFactory.port", this.portPop3);
+            props.put("mail.pop3.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+            props.put("mail.pop3.socketFactory.fallback", "false");
+            props.setProperty("mail.store.protocol", "pop3");
+        }
 
         Session session = Session.getInstance(props, null);
         Store store = null;
@@ -83,7 +96,10 @@ public class MailSettings {
             return false;
         }
         try {
-            store.connect(this.addressImap, email, password);
+            if (isImap)
+                store.connect(this.addressImap, email, password);
+            else
+                store.connect(this.addressPop3, email, password);
         } catch (MessagingException e) {
             e.printStackTrace();
             return false;
@@ -97,7 +113,7 @@ public class MailSettings {
      * @param SQLiteDatabase        Database
      * @return void
      * */
-    public void addSettings(SQLiteDatabase sdb){
+    public void addSettings(SQLiteDatabase sdb, int boxCode){
         ContentValues values = new ContentValues();
         values.put(DatabaseHelper.NAME_POST_SERVER, this.namePostServer);
         values.put(DatabaseHelper.ADDRESS_IMAP, this.addressImap);
@@ -106,8 +122,8 @@ public class MailSettings {
         values.put(DatabaseHelper.PORT_POP3, this.portPop3);
         values.put(DatabaseHelper.ADDRESS_SMTP, this.addressSmtp);
         values.put(DatabaseHelper.PORT_SMTP, this.portSmtp);
+        values.put(DatabaseHelper.BOX_CODE, boxCode);
         sdb.insert(DatabaseHelper.TABLE_MAIL_SETTINGS, null, values);
-        sdb.close();
     }
 
     public String getNamePostServer() {
