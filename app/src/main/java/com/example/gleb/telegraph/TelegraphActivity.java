@@ -13,6 +13,7 @@ import com.example.gleb.telegraph.models.MailBox;
 import com.example.gleb.telegraph.models.MailFolder;
 import com.example.gleb.telegraph.models.MailSettings;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,9 +24,11 @@ import javax.mail.Flags;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.Multipart;
 import javax.mail.NoSuchProviderException;
 import javax.mail.Session;
 import javax.mail.Store;
+import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeUtility;
 import javax.mail.search.FlagTerm;
 
@@ -115,6 +118,8 @@ public class TelegraphActivity extends AbstractActivity {
                 e.printStackTrace();
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
 
             return null;
@@ -126,7 +131,7 @@ public class TelegraphActivity extends AbstractActivity {
      * @param Folder[]        Array of folder from post server
      * @return void
      * */
-    private void parseFolder(Folder[] folders) throws MessagingException, UnsupportedEncodingException {
+    private void parseFolder(Folder[] folders) throws MessagingException, IOException {
         SQLiteDatabase sdb = databaseHelper.getWritableDatabase();
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
         for (Folder f : folders){
@@ -148,21 +153,28 @@ public class TelegraphActivity extends AbstractActivity {
      * @param Message[]        Array of message from post server
      * @return void
      * */
-    private void parsePostMessage(Message[] messages) throws MessagingException, UnsupportedEncodingException {
+    private void parsePostMessage(Message[] messages) throws MessagingException, IOException {
         List<String> emails = new ArrayList<>();
         List<String> names = new ArrayList<>();
         List<String> dates = new ArrayList<>();
+        List<String> subjects = new ArrayList<>();
+        List<String> bodies = new ArrayList<>();
         if (messages.length > 5)
             for (int i = messages.length - 1; i > messages.length - 5; i--){
                 emails.add(parseEmailAddress(messages[i]));
                 names.add(parseNameEmail(messages[i]));
                 dates.add(parseDate(messages[i]));
+                subjects.add(parseSubject(messages[i]));
+                Object content = new MimeMessage((MimeMessage) messages[i]).getContent();
+                if (content instanceof String)
+                    bodies.add(parseContentString(content));
             }
         else
             for (int i = messages.length - 1; i >= 0; i--){
                 emails.add(parseEmailAddress(messages[i]));
                 names.add(parseNameEmail(messages[i]));
                 dates.add(parseDate(messages[i]));
+                subjects.add(parseSubject(messages[i]));
             }
 
     }
@@ -217,5 +229,22 @@ public class TelegraphActivity extends AbstractActivity {
                 + (message.getSentDate().getMonth() + 1) + "."
                 + (message.getSentDate().getYear() % 100);
         return date;
+    }
+
+    /**
+     * Get subject from mail
+     * @param Message        Subject of mail from post server
+     * @return String        Subject of mail
+     * */
+    private String parseSubject(Message message) throws MessagingException, UnsupportedEncodingException {
+        String subject = "";
+        subject = message.getSubject();
+        return subject;
+    }
+
+    private String parseContentString(Object content) throws MessagingException, UnsupportedEncodingException {
+        String body = "";
+        body = (String) content;
+        return body;
     }
 }
