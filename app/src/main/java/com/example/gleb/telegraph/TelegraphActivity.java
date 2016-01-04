@@ -140,13 +140,16 @@ public class TelegraphActivity extends AbstractActivity {
 
     private void parsePostMessage(Message[] messages) throws MessagingException, UnsupportedEncodingException {
         List<String> emails = new ArrayList<>();
+        List<String> names = new ArrayList<>();
         if (messages.length > 5)
             for (int i = messages.length - 1; i > messages.length - 5; i--){
                 emails.add(parseEmailAddress(messages[i]));
+                names.add(parseNameEmail(messages[i]));
             }
         else
             for (int i = messages.length - 1; i >= 0; i--){
                 emails.add(parseEmailAddress(messages[i]));
+                names.add(parseNameEmail(messages[i]));
             }
 
     }
@@ -163,5 +166,19 @@ public class TelegraphActivity extends AbstractActivity {
                 email = decodeAddress.substring(decodeAddress.indexOf("<"), decodeAddress.indexOf(">") + 1);
         }
         return email;
+    }
+
+    private String parseNameEmail(Message message) throws MessagingException, UnsupportedEncodingException {
+        String name = "";
+        Address[] in = message.getFrom();
+        for (Address address : in) {
+            String decodeAddress = MimeUtility.decodeText(address.toString());
+            if (decodeAddress.indexOf("<") == -1 && decodeAddress.indexOf(">") == -1)
+                name = decodeAddress;
+            else
+                //add name of sender of mail
+                name = decodeAddress.substring(0, decodeAddress.indexOf("<"));
+        }
+        return name;
     }
 }
