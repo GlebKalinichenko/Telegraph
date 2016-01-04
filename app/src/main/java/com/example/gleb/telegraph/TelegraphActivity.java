@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Properties;
 
 import javax.mail.Address;
+import javax.mail.BodyPart;
 import javax.mail.Flags;
 import javax.mail.Folder;
 import javax.mail.Message;
@@ -168,6 +169,8 @@ public class TelegraphActivity extends AbstractActivity {
                 Object content = new MimeMessage((MimeMessage) messages[i]).getContent();
                 if (content instanceof String)
                     bodies.add(parseContentString(content));
+                else if (content instanceof  Multipart)
+                    bodies.add(parseContentMultipart(content));
             }
         else
             for (int i = messages.length - 1; i >= 0; i--){
@@ -245,6 +248,14 @@ public class TelegraphActivity extends AbstractActivity {
     private String parseContentString(Object content) throws MessagingException, UnsupportedEncodingException {
         String body = "";
         body = (String) content;
+        return body;
+    }
+
+    private String parseContentMultipart(Object content) throws MessagingException, IOException {
+        String body = "";
+        Multipart mp = (Multipart) content;
+        BodyPart bp = mp.getBodyPart(0);
+        body = bp.getContent().toString();
         return body;
     }
 }
