@@ -109,7 +109,7 @@ public class TelegraphActivity extends AbstractActivity {
                 else
                     store.connect(mailSettings.getAddressPop3(), email, password);
                 Folder[] folders = store.getDefaultFolder().list();
-                parseFolder(folders, store);
+                parseFolder(folders);
 
             } catch (MessagingException e) {
                 e.printStackTrace();
@@ -121,7 +121,12 @@ public class TelegraphActivity extends AbstractActivity {
         }
     }
 
-    private void parseFolder(Folder[] folders, Store store) throws MessagingException, UnsupportedEncodingException {
+    /**
+     * Get mails from folders
+     * @param Folder[]        Array of folder from post server
+     * @return void
+     * */
+    private void parseFolder(Folder[] folders) throws MessagingException, UnsupportedEncodingException {
         SQLiteDatabase sdb = databaseHelper.getWritableDatabase();
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
         for (Folder f : folders){
@@ -138,22 +143,35 @@ public class TelegraphActivity extends AbstractActivity {
         db.close();
     }
 
+    /**
+     * Parse mail from message
+     * @param Message[]        Array of message from post server
+     * @return void
+     * */
     private void parsePostMessage(Message[] messages) throws MessagingException, UnsupportedEncodingException {
         List<String> emails = new ArrayList<>();
         List<String> names = new ArrayList<>();
+        List<String> dates = new ArrayList<>();
         if (messages.length > 5)
             for (int i = messages.length - 1; i > messages.length - 5; i--){
                 emails.add(parseEmailAddress(messages[i]));
                 names.add(parseNameEmail(messages[i]));
+                dates.add(parseDate(messages[i]));
             }
         else
             for (int i = messages.length - 1; i >= 0; i--){
                 emails.add(parseEmailAddress(messages[i]));
                 names.add(parseNameEmail(messages[i]));
+                dates.add(parseDate(messages[i]));
             }
 
     }
 
+    /**
+     * Get email of sender
+     * @param Message        Message with email of sender
+     * @return String        Email of sender
+     * */
     private String parseEmailAddress(Message message) throws MessagingException, UnsupportedEncodingException {
         String email = "";
         Address[] in = message.getFrom();
@@ -168,6 +186,11 @@ public class TelegraphActivity extends AbstractActivity {
         return email;
     }
 
+    /**
+     * Get name of sender
+     * @param Message        Message with name of sender
+     * @return String        Name of sender
+     * */
     private String parseNameEmail(Message message) throws MessagingException, UnsupportedEncodingException {
         String name = "";
         Address[] in = message.getFrom();
@@ -180,5 +203,19 @@ public class TelegraphActivity extends AbstractActivity {
                 name = decodeAddress.substring(0, decodeAddress.indexOf("<"));
         }
         return name;
+    }
+
+    /**
+     * Get send date from mail
+     * @param Message        Message with mail from post server
+     * @return String        Send date of mail
+     * */
+    private String parseDate(Message message) throws MessagingException, UnsupportedEncodingException {
+        String date = "";
+        String[] parts = message.getSentDate().toString().split(" ");
+        date = String.valueOf(parts[3] + message.getSentDate().getDate()) + "."
+                + (message.getSentDate().getMonth() + 1) + "."
+                + (message.getSentDate().getYear() % 100);
+        return date;
     }
 }
