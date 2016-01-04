@@ -46,8 +46,8 @@ public class MailBox {
      * @param SQLiteDatabase        Database
      * @return int                  Last inserted index
      * */
-    public int getLastAccount(SQLiteDatabase sdb){
-        String query = "SELECT last_insert_rowid()";
+    public static int getLastAccount(SQLiteDatabase sdb){
+        String query = "SELECT IdMailBox from MailBoxes order by IdMailBox DESC limit 1";
         Cursor cursor = sdb.rawQuery(query, null);
         cursor.moveToLast();
         int boxCode = cursor.getInt(0);
