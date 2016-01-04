@@ -1,26 +1,22 @@
 package com.example.gleb.telegraph.models;
 
 import android.content.ContentValues;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Bundle;
 
 import com.example.gleb.telegraph.DatabaseHelper;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
+import java.io.Serializable;
 import java.util.Properties;
 
-import javax.mail.MessagingException;
-import javax.mail.NoSuchProviderException;
-import javax.mail.Session;
-import javax.mail.Store;
+import javax.mail.*;
 
 /**
  * Created by Gleb on 30.12.2015.
  */
-public class MailSettings {
+public class MailSettings implements Serializable {
     private String namePostServer;
     private String addressImap;
     private String portImap;
@@ -96,8 +92,9 @@ public class MailSettings {
             return false;
         }
         try {
-            if (isImap)
+            if (isImap) {
                 store.connect(this.addressImap, email, password);
+            }
             else
                 store.connect(this.addressPop3, email, password);
         } catch (MessagingException e) {
