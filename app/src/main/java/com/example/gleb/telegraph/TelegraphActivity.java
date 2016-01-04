@@ -5,7 +5,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
@@ -14,13 +13,21 @@ import com.example.gleb.telegraph.models.MailBox;
 import com.example.gleb.telegraph.models.MailFolder;
 import com.example.gleb.telegraph.models.MailSettings;
 
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
+import javax.mail.Address;
+import javax.mail.Flags;
 import javax.mail.Folder;
+import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.NoSuchProviderException;
 import javax.mail.Session;
 import javax.mail.Store;
+import javax.mail.internet.MimeUtility;
+import javax.mail.search.FlagTerm;
 
 /**
  * Created by Gleb on 03.01.2016.
@@ -102,9 +109,11 @@ public class TelegraphActivity extends AbstractActivity {
                 else
                     store.connect(mailSettings.getAddressPop3(), email, password);
                 Folder[] folders = store.getDefaultFolder().list();
-                parseMail(folders, store);
+                parseFolder(folders, store);
 
             } catch (MessagingException e) {
+                e.printStackTrace();
+            } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
 
@@ -112,14 +121,47 @@ public class TelegraphActivity extends AbstractActivity {
         }
     }
 
-    private void parseMail(Folder[] folders, Store store){
+    private void parseFolder(Folder[] folders, Store store) throws MessagingException, UnsupportedEncodingException {
         SQLiteDatabase sdb = databaseHelper.getWritableDatabase();
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
         for (Folder f : folders){
             MailFolder folder = new MailFolder(f.getName());
             folder.addFolder(sdb, MailBox.getLastAccount(db));
+
+            f.open(Folder.READ_ONLY);
+            FlagTerm ft = new FlagTerm(new Flags(Flags.Flag.USER), false);
+            Message[] messages = f.search(ft);
+            if (messages.length != 0)
+                parsePostMessage(messages);
         }
         sdb.close();
         db.close();
+    }
+
+    private void parsePostMessage(Message[] messages) throws MessagingException, UnsupportedEncodingException {
+        List<String> emails = new ArrayList<>();
+        if (messages.length > 5)
+            for (int i = messages.length - 1; i > messages.length - 5; i--){
+                emails.add(parseEmailAddress(messages[i]));
+            }
+        else
+            for (int i = messages.length - 1; i >= 0; i--){
+                emails.add(parseEmailAddress(messages[i]));
+            }
+
+    }
+
+    private String parseEmailAddress(Message message) throws MessagingException, UnsupportedEncodingException {
+        String email = "";
+        Address[] in = message.getFrom();
+        for (Address address : in) {
+            String decodeAddress = MimeUtility.decodeText(address.toString());
+            if (decodeAddress.indexOf("<") == -1 && decodeAddress.indexOf(">") == -1)
+                email = decodeAddress;
+            else
+                //add email of sender of mail
+                email = decodeAddress.substring(decodeAddress.indexOf("<"), decodeAddress.indexOf(">") + 1);
+        }
+        return email;
     }
 }
