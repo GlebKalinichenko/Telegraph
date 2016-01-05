@@ -2,14 +2,14 @@ package com.example.gleb.telegraph;
 
 import android.database.sqlite.SQLiteDatabase;
 
+import com.example.gleb.telegraph.models.Mail;
 import com.example.gleb.telegraph.models.MailBox;
 import com.example.gleb.telegraph.models.MailFolder;
+import com.example.gleb.telegraph.models.User;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.mail.Address;
 import javax.mail.BodyPart;
@@ -27,12 +27,20 @@ import javax.mail.search.FlagTerm;
  * Created by Gleb on 04.01.2016.
  */
 public class ParserMail {
+    private String emailReceiver;
+    private DatabaseHelper databaseHelper;
+
+    public ParserMail(String emailReceiver, DatabaseHelper databaseHelper) {
+        this.emailReceiver = emailReceiver;
+        this.databaseHelper = databaseHelper;
+    }
+
     /**
      * Get mails from folders
      * @param Folder[]        Array of folder from post server
      * @return void
      * */
-    public void parseFolder(Folder[] folders, DatabaseHelper databaseHelper) throws MessagingException, IOException {
+    public void parseFolder(Folder[] folders) throws MessagingException, IOException {
         SQLiteDatabase sdb = databaseHelper.getWritableDatabase();
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
         for (Folder f : folders){
@@ -55,29 +63,57 @@ public class ParserMail {
      * @return void
      * */
     private void parsePostMessage(Message[] messages) throws MessagingException, IOException {
-        List<String> emails = new ArrayList<>();
-        List<String> names = new ArrayList<>();
-        List<String> dates = new ArrayList<>();
-        List<String> subjects = new ArrayList<>();
-        List<String> bodies = new ArrayList<>();
+        String emailSender = "";
+        String nameSender = "";
+        String date = "";
+        String subject = "";
+        String body = "";
+        boolean hasAttach = false;
+        Mail mail;
         if (messages.length > 5)
             for (int i = messages.length - 1; i > messages.length - 5; i--){
-                emails.add(parseEmailAddress(messages[i]));
-                names.add(parseNameEmail(messages[i]));
-                dates.add(parseDate(messages[i]));
-                subjects.add(parseSubject(messages[i]));
+                emailSender = parseEmailAddress(messages[i]);
+                nameSender = parseNameEmail(messages[i]);
+                date = parseDate(messages[i]);
+                subject = parseSubject(messages[i]);
                 Object content = new MimeMessage((MimeMessage) messages[i]).getContent();
                 if (content instanceof String)
-                    bodies.add(parseContentString(content));
-                else if (content instanceof Multipart)
-                    bodies.add(parseContentMultipart(content));
+                    body = parseContentString(content);
+                else if (content instanceof Multipart) {
+                    body = parseContentMultipart(content);
+                    hasAttach = parseMultipartAttach((Multipart) content);
+                }
+                mail = new Mail(emailSender, nameSender, emailReceiver, subject, body, date, hasAttach);
+                //if user is no in table Users add it and return his index
+                if (User.checkUserEmail(databaseHelper.getReadableDatabase(), emailSender) == 0) {
+                    User user = new User(emailSender);
+                    //add user
+                    user.addUser(databaseHelper.getReadableDatabase());
+                    //add mail at first return index last inserted user and get last folder
+                    mail.addMail(databaseHelper.getWritableDatabase(),
+                            User.getLastUser(databaseHelper.getReadableDatabase()),
+                            MailFolder.getLastFolder(databaseHelper.getReadableDatabase()), 1);
+                }else
+                    //add mail at first return index user and get last folder
+                    mail.addMail(databaseHelper.getWritableDatabase(),
+                            User.checkUserEmail(databaseHelper.getReadableDatabase(), emailSender),
+                            MailFolder.getLastFolder(databaseHelper.getReadableDatabase()), 1);
+
             }
         else
             for (int i = messages.length - 1; i >= 0; i--){
-                emails.add(parseEmailAddress(messages[i]));
-                names.add(parseNameEmail(messages[i]));
-                dates.add(parseDate(messages[i]));
-                subjects.add(parseSubject(messages[i]));
+                emailSender = parseEmailAddress(messages[i]);
+                nameSender = parseNameEmail(messages[i]);
+                date = parseDate(messages[i]);
+                subject = parseSubject(messages[i]);
+                Object content = new MimeMessage((MimeMessage) messages[i]).getContent();
+                if (content instanceof String)
+                    body = parseContentString(content);
+                else if (content instanceof Multipart) {
+                    body = parseContentMultipart(content);
+                    hasAttach = parseMultipartAttach((Multipart) content);
+                }
+                mail = new Mail(emailSender, nameSender, emailReceiver, subject, body, date, hasAttach);
             }
 
     }
@@ -96,7 +132,7 @@ public class ParserMail {
                 email = decodeAddress;
             else
                 //add email of sender of mail
-                email = decodeAddress.substring(decodeAddress.indexOf("<"), decodeAddress.indexOf(">") + 1);
+                email = decodeAddress.substring(decodeAddress.indexOf("<") + 1, decodeAddress.indexOf(">"));
         }
         return email;
     }
@@ -166,7 +202,6 @@ public class ParserMail {
         Multipart mp = (Multipart) content;
         BodyPart bp = mp.getBodyPart(0);
         body = bp.getContent().toString();
-        parseMultipartAttach(mp);
         return body;
     }
 
@@ -175,12 +210,15 @@ public class ParserMail {
      * @param Multipart        Body of mail
      * @return void
      * */
-    private void parseMultipartAttach(Multipart content) throws MessagingException, IOException {
+    private boolean parseMultipartAttach(Multipart content) throws MessagingException, IOException {
+        boolean hasAttach = false;
         for (int j = 0; j < content.getCount(); j++) {
             BodyPart bodyPart = content.getBodyPart(j);
             if (Part.ATTACHMENT.equalsIgnoreCase(bodyPart.getDisposition())) {
                 InputStream is = bodyPart.getInputStream();
+                hasAttach = true;
             }
         }
+        return hasAttach;
     }
 }
