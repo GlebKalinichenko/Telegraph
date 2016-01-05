@@ -5,11 +5,13 @@ import android.database.sqlite.SQLiteDatabase;
 import com.example.gleb.telegraph.models.Mail;
 import com.example.gleb.telegraph.models.MailBox;
 import com.example.gleb.telegraph.models.MailFolder;
+import com.example.gleb.telegraph.models.StraightIndex;
 import com.example.gleb.telegraph.models.User;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 import javax.mail.Address;
 import javax.mail.BodyPart;
@@ -68,7 +70,7 @@ public class ParserMail {
         String date = "";
         String subject = "";
         String body = "";
-        boolean hasAttach = false;
+        int hasAttach = 0;
         Mail mail;
         if (messages.length > 5)
             for (int i = messages.length - 1; i > messages.length - 5; i--){
@@ -83,7 +85,8 @@ public class ParserMail {
                     body = parseContentMultipart(content);
                     hasAttach = parseMultipartAttach((Multipart) content);
                 }
-                mail = new Mail(emailSender, nameSender, emailReceiver, subject, body, date, hasAttach);
+                mail = new Mail(emailSender, nameSender, emailReceiver, subject, body, date,
+                        hasAttach, StraightIndex.STRAIGHT);
                 //if user is no in table Users add it and return his index
                 if (User.checkUserEmail(databaseHelper.getReadableDatabase(), emailSender) == 0) {
                     User user = new User(emailSender);
@@ -92,13 +95,12 @@ public class ParserMail {
                     //add mail at first return index last inserted user and get last folder
                     mail.addMail(databaseHelper.getWritableDatabase(),
                             User.getLastUser(databaseHelper.getReadableDatabase()),
-                            MailFolder.getLastFolder(databaseHelper.getReadableDatabase()), 1);
+                            MailFolder.getLastFolder(databaseHelper.getReadableDatabase()));
                 }else
                     //add mail at first return index user and get last folder
                     mail.addMail(databaseHelper.getWritableDatabase(),
                             User.checkUserEmail(databaseHelper.getReadableDatabase(), emailSender),
-                            MailFolder.getLastFolder(databaseHelper.getReadableDatabase()), 1);
-
+                            MailFolder.getLastFolder(databaseHelper.getReadableDatabase()));
             }
         else
             for (int i = messages.length - 1; i >= 0; i--){
@@ -113,7 +115,22 @@ public class ParserMail {
                     body = parseContentMultipart(content);
                     hasAttach = parseMultipartAttach((Multipart) content);
                 }
-                mail = new Mail(emailSender, nameSender, emailReceiver, subject, body, date, hasAttach);
+                mail = new Mail(emailSender, nameSender, emailReceiver, subject, body, date,
+                        hasAttach, StraightIndex.STRAIGHT);
+                //if user is no in table Users add it and return his index
+                if (User.checkUserEmail(databaseHelper.getReadableDatabase(), emailSender) == 0) {
+                    User user = new User(emailSender);
+                    //add user
+                    user.addUser(databaseHelper.getReadableDatabase());
+                    //add mail at first return index last inserted user and get last folder
+                    mail.addMail(databaseHelper.getWritableDatabase(),
+                            User.getLastUser(databaseHelper.getReadableDatabase()),
+                            MailFolder.getLastFolder(databaseHelper.getReadableDatabase()));
+                }else
+                    //add mail at first return index user and get last folder
+                    mail.addMail(databaseHelper.getWritableDatabase(),
+                            User.checkUserEmail(databaseHelper.getReadableDatabase(), emailSender),
+                            MailFolder.getLastFolder(databaseHelper.getReadableDatabase()));
             }
 
     }
@@ -210,13 +227,13 @@ public class ParserMail {
      * @param Multipart        Body of mail
      * @return void
      * */
-    private boolean parseMultipartAttach(Multipart content) throws MessagingException, IOException {
-        boolean hasAttach = false;
+    private int parseMultipartAttach(Multipart content) throws MessagingException, IOException {
+        int hasAttach = 0;
         for (int j = 0; j < content.getCount(); j++) {
             BodyPart bodyPart = content.getBodyPart(j);
             if (Part.ATTACHMENT.equalsIgnoreCase(bodyPart.getDisposition())) {
                 InputStream is = bodyPart.getInputStream();
-                hasAttach = true;
+                hasAttach = 1;
             }
         }
         return hasAttach;
