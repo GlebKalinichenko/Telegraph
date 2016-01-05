@@ -40,13 +40,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     /**Table Mails*/
     public static final String TABLE_MAILS = "Mails";
     public static final String ID_MAIL = "IdMail";
-    public static final String SENDER = "Sender";
-    public static final String USER_CODE = "UserCode";
+    public static final String SENDER_USER_CODE = "SenderUserCode";
+    public static final String NAME_SENDER = "NameSender";
+    public static final String RECEIVER = "Receiver";
     public static final String SUBJECT = "Subject";
     public static final String CONTENT = "Content";
     public static final String FOLDER_CODE = "FolderCode";
     public static final String DATE = "Date";
     public static final String HAS_ATTACH = "HasAttach";
+    public static final String STRAIGHT_INDEX = "StraightIndex";
 
     /**Table Attachs*/
     public static final String TABLE_ATTACHS = "Attachs";
@@ -64,6 +66,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String TABLE_USER_KEYS = "UserKeys";
     public static final String ID_USER_KEY = "IdUserKey";
     public static final String LINK_TO_USER_KEY_FOLDER = "LinkToFolder";
+    public static final String USER_CODE = "UserCode";
 
     /**Table User signature*/
     public static final String TABLE_USER_SIGNATURES = "UserSignatures";
@@ -111,11 +114,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             " (" + ID_MAIL_BOX + ") ON DELETE CASCADE ON UPDATE CASCADE" + ");";
 
     public static final String CREATE_MAILS = "CREATE TABLE " + TABLE_MAILS + " (" +
-            ID_MAIL + " INTEGER PRIMARY KEY AUTOINCREMENT, " + SENDER + " TEXT," + USER_CODE +
-            " INTEGER, " + SUBJECT + " TEXT, " + CONTENT + " TEXT, " + FOLDER_CODE + " INTEGER, "
-            + DATE + " TEXT, " +  HAS_ATTACH + " INTEGER, " + " FOREIGN KEY (" + FOLDER_CODE
+            ID_MAIL + " INTEGER PRIMARY KEY AUTOINCREMENT, " + SENDER_USER_CODE + " INTEGER," + NAME_SENDER +
+            " TEXT, " + RECEIVER + " TEXT, " + SUBJECT + " TEXT, " + CONTENT + " TEXT, "
+            + FOLDER_CODE + " INTEGER, " + DATE + " TEXT, " +  HAS_ATTACH + " INTEGER, " + STRAIGHT_INDEX + " INTEGER, " + " FOREIGN KEY (" + FOLDER_CODE
             + ") REFERENCES " + TABLE_FOLDERS + " (" + ID_FOLDER + ") ON DELETE CASCADE ON UPDATE CASCADE, "
-            + "FOREIGN KEY (" + USER_CODE + ") REFERENCES " + TABLE_USERS + " (" + ID_USER
+            + "FOREIGN KEY (" + SENDER_USER_CODE + ") REFERENCES " + TABLE_USERS + " (" + ID_USER
             + ") ON DELETE CASCADE ON UPDATE CASCADE" + ");";
 
     public static final String CREATE_USERS = "CREATE TABLE " + TABLE_USERS + " (" +
