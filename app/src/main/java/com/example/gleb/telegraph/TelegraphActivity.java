@@ -115,8 +115,8 @@ public class TelegraphActivity extends AbstractActivity {
                 else
                     store.connect(mailSettings.getAddressPop3(), email, password);
                 Folder[] folders = store.getDefaultFolder().list();
-                ParserMail parserMail = new ParserMail();
-                parserMail.parseFolder(folders, databaseHelper);
+                ParserMail parserMail = new ParserMail(email, databaseHelper);
+                parserMail.parseFolder(folders);
 
             } catch (MessagingException e) {
                 e.printStackTrace();
