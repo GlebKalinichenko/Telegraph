@@ -1,7 +1,9 @@
 package com.example.gleb.telegraph;
 
+import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.example.gleb.telegraph.models.Attach;
 import com.example.gleb.telegraph.models.Mail;
 import com.example.gleb.telegraph.models.MailBox;
 import com.example.gleb.telegraph.models.MailFolder;
@@ -101,6 +103,23 @@ public class ParserMail {
                     mail.addMail(databaseHelper.getWritableDatabase(),
                             User.checkUserEmail(databaseHelper.getReadableDatabase(), emailSender),
                             MailFolder.getLastFolder(databaseHelper.getReadableDatabase()));
+
+                //get attach files from post server
+                if (hasAttach == 1){
+                    Multipart context = (Multipart) content;
+                    for (int j = 0; j < context.getCount(); j++) {
+                        BodyPart bodyPart = context.getBodyPart(j);
+                        if (Part.ATTACHMENT.equalsIgnoreCase(bodyPart.getDisposition())) {
+                            InputStream is = bodyPart.getInputStream();
+                            String nameAttach = bodyPart.getFileName();
+                            int posAttach = AttachApplication.add(is);
+                            Attach attach = new Attach(nameAttach, posAttach);
+                            //add attach to database
+                            attach.addAttach(databaseHelper.getWritableDatabase(),
+                                    Mail.getLastMail(databaseHelper.getReadableDatabase()));
+                        }
+                    }
+                }
             }
         else
             for (int i = messages.length - 1; i >= 0; i--){
@@ -131,6 +150,23 @@ public class ParserMail {
                     mail.addMail(databaseHelper.getWritableDatabase(),
                             User.checkUserEmail(databaseHelper.getReadableDatabase(), emailSender),
                             MailFolder.getLastFolder(databaseHelper.getReadableDatabase()));
+
+                //get attach files from post server
+                if (hasAttach == 1){
+                    Multipart context = (Multipart) content;
+                    for (int j = 0; j < context.getCount(); j++) {
+                        BodyPart bodyPart = context.getBodyPart(j);
+                        if (Part.ATTACHMENT.equalsIgnoreCase(bodyPart.getDisposition())) {
+                            InputStream is = bodyPart.getInputStream();
+                            String nameAttach = bodyPart.getFileName();
+                            int posAttach = AttachApplication.add(is);
+                            Attach attach = new Attach(nameAttach, posAttach);
+                            //add attach to database
+                            attach.addAttach(databaseHelper.getWritableDatabase(),
+                                    Mail.getLastMail(databaseHelper.getReadableDatabase()));
+                        }
+                    }
+                }
             }
 
     }
