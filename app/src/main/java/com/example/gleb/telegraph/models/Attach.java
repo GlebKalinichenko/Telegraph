@@ -17,6 +17,12 @@ public class Attach {
         this.numPositions = numPositions;
     }
 
+    /**
+     * Add attach to database
+     * @param SQLiteDatabase        Database
+     * @param int                   Id mail
+     * @return void
+     * */
     public void addAttach(SQLiteDatabase sdb, int mailCode){
         ContentValues values = new ContentValues();
         values.put(DatabaseHelper.NAME_ATTACH, this.nameAttachs);
