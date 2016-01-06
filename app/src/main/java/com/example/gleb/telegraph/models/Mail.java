@@ -62,36 +62,37 @@ public class Mail {
      * */
     public static List<Mail> selectAllMail(SQLiteDatabase sdb){
         List<Mail> mails = new ArrayList<>();
-        Cursor cursor = sdb.query(DatabaseHelper.TABLE_MAILS,
-                new String[]{DatabaseHelper.ID_MAIL, DatabaseHelper.SENDER_USER_CODE,
-                DatabaseHelper.NAME_SENDER, DatabaseHelper.RECEIVER, DatabaseHelper.SUBJECT,
-                DatabaseHelper.CONTENT, DatabaseHelper.DATE, DatabaseHelper.FOLDER_CODE,
-                DatabaseHelper.HAS_ATTACH, DatabaseHelper.STRAIGHT_INDEX},
-                null, null, null, null, null);
+        String query = "Select Users.Email, Mails.NameSender, Mails.Receiver, Mails.Subject," +
+                " Mails.Content, Mails.Date, Mails.HasAttach, Mails.StraightIndex " +
+                "from Mails inner join Users on Mails.SenderUserCode = Users.IdUser";
+        Cursor cursor = sdb.rawQuery(query, null);
         if (cursor != null && cursor.moveToFirst()) {
-            do {
-                int id = cursor.getInt(0);
-                int senderCode = cursor.getInt(1);
-                Cursor cursorUser = sdb.query(DatabaseHelper.TABLE_USERS, new String[]{
-                        DatabaseHelper.EMAIL_USER}, DatabaseHelper.ID_USER + "=?",
-                        new String[]{String.valueOf(senderCode)}, null, null, null, null);
-                if (cursorUser != null && cursorUser.moveToFirst()) {
-                    String sender = cursorUser.getString(0);
-                    String namesender = cursor.getString(2);
-                    String receiver = cursor.getString(3);
-                    String subject = cursor.getString(4);
-                    String content = cursor.getString(5);
-                    String date = cursor.getString(6);
-                    int hasAttach = cursor.getInt(7);
-                    int straightIndex = cursor.getInt(8);
-                    Mail mail = new Mail(sender, namesender, receiver, subject, content, date,
-                            hasAttach, straightIndex);
-                    mails.add(mail);
-                }
-            }
-            while (cursor.moveToNext());
+            String sender = cursor.getString(0);
+            String namesender = cursor.getString(1);
+            String receiver = cursor.getString(2);
+            String subject = cursor.getString(3);
+            String content = cursor.getString(4);
+            String date = cursor.getString(5);
+            int hasAttach = cursor.getInt(6);
+            int straightIndex = cursor.getInt(7);
+            Mail mail = new Mail(sender, namesender, receiver, subject, content, date,
+                    hasAttach, straightIndex);
+            mails.add(mail);
         }
         return mails;
+    }
+
+    /**
+     * Get last index of mail in database
+     * @param SQLiteDatabase        Database
+     * @return int                  Id of last mail in database
+     * */
+    public static int getLastMail(SQLiteDatabase sdb){
+        String query = "SELECT IdMail from Mails order by IdMail DESC limit 1";
+        Cursor cursor = sdb.rawQuery(query, null);
+        cursor.moveToLast();
+        int folderCode = cursor.getInt(0);
+        return folderCode;
     }
 
     public String getNameSender() {
