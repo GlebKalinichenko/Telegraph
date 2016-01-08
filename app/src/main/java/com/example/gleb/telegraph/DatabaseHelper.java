@@ -54,7 +54,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String TABLE_ATTACHS = "Attachs";
     public static final String ID_ATTACH = "IdAttach";
     public static final String NAME_ATTACH = "NameAttach";
-    public static final String NUM_POSITION = "NumPosiitonOfAttach";
+    public static final String NUM_POSITION = "NumPositionOfAttach";
     public static final String MAIL_CODE = "MailCode";
 
     /**Table Users*/
