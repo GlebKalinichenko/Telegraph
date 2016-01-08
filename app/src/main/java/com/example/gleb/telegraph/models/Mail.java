@@ -67,17 +67,20 @@ public class Mail {
                 "from Mails inner join Users on Mails.SenderUserCode = Users.IdUser";
         Cursor cursor = sdb.rawQuery(query, null);
         if (cursor != null && cursor.moveToFirst()) {
-            String sender = cursor.getString(0);
-            String namesender = cursor.getString(1);
-            String receiver = cursor.getString(2);
-            String subject = cursor.getString(3);
-            String content = cursor.getString(4);
-            String date = cursor.getString(5);
-            int hasAttach = cursor.getInt(6);
-            int straightIndex = cursor.getInt(7);
-            Mail mail = new Mail(sender, namesender, receiver, subject, content, date,
-                    hasAttach, straightIndex);
-            mails.add(mail);
+            do {
+                String sender = cursor.getString(0);
+                String namesender = cursor.getString(1);
+                String receiver = cursor.getString(2);
+                String subject = cursor.getString(3);
+                String content = cursor.getString(4);
+                String date = cursor.getString(5);
+                int hasAttach = cursor.getInt(6);
+                int straightIndex = cursor.getInt(7);
+                Mail mail = new Mail(sender, namesender, receiver, subject, content, date,
+                        hasAttach, straightIndex);
+                mails.add(mail);
+            }
+            while (cursor.moveToNext());
         }
         return mails;
     }
