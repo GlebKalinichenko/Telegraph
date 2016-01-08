@@ -1,6 +1,7 @@
 package com.example.gleb.telegraph;
 
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
 
 import com.example.gleb.telegraph.models.Mail;
 import com.example.gleb.telegraph.models.MailBox;
@@ -41,22 +42,33 @@ public class ParserMail {
      * @return void
      * */
     public void parseFolder(Folder[] folders) throws MessagingException, IOException {
-        SQLiteDatabase sdb = databaseHelper.getWritableDatabase();
-        SQLiteDatabase db = databaseHelper.getReadableDatabase();
-        sdb.beginTransaction();
-        for (Folder f : folders){
-            MailFolder folder = new MailFolder(f.getName());
-            folder.addFolder(sdb, MailBox.getLastAccount(db));
-            f.open(Folder.READ_ONLY);
-            FlagTerm ft = new FlagTerm(new Flags(Flags.Flag.USER), false);
-            Message[] messages = f.search(ft);
-            if (messages.length != 0)
-                parsePostMessage(messages);
-        }
-        sdb.setTransactionSuccessful();
-        sdb.endTransaction();
-        sdb.close();
-        db.close();
+//        SQLiteDatabase sdb = databaseHelper.getWritableDatabase();
+//        SQLiteDatabase db = databaseHelper.getReadableDatabase();
+//        String sql = "insert into Folders (NameFolder, MailBoxCode) values (?, ?);";
+//        SQLiteStatement stmt = sdb.compileStatement(sql);
+//        sdb.beginTransaction();
+//        for (Folder f : folders){
+//            MailFolder folder = new MailFolder(f.getName());
+////            folder.addFolder(sdb, MailBox.getLastAccount(db));
+//            stmt.bindString(1, folder.getFolder());
+//            stmt.bindLong(2, MailBox.getLastAccount(db));
+//            long entryID = stmt.executeInsert();
+//            stmt.clearBindings();
+//        }
+//        sdb.setTransactionSuccessful();
+//        sdb.endTransaction();
+//        sdb.close();
+//        db.close();
+
+        MailFolder.addFolders(databaseHelper, folders);
+
+//        for (Folder f : folders){
+//            f.open(Folder.READ_ONLY);
+//            FlagTerm ft = new FlagTerm(new Flags(Flags.Flag.USER), false);
+//            Message[] messages = f.search(ft);
+//            if (messages.length != 0)
+//                parsePostMessage(messages);
+//        }
     }
 
     /**
@@ -70,7 +82,7 @@ public class ParserMail {
         String date = "";
         String subject = "";
         String body = "";
-        boolean hasAttach = false;
+        int hasAttach = 0;
         Mail mail;
         if (messages.length > 5) {
             SQLiteDatabase sdb = databaseHelper.getWritableDatabase();
@@ -216,13 +228,13 @@ public class ParserMail {
      * @param Multipart        Body of mail
      * @return void
      * */
-    private boolean parseMultipartAttach(Multipart content) throws MessagingException, IOException {
-        boolean hasAttach = false;
+    private int parseMultipartAttach(Multipart content) throws MessagingException, IOException {
+        int hasAttach = 0;
         for (int j = 0; j < content.getCount(); j++) {
             BodyPart bodyPart = content.getBodyPart(j);
             if (Part.ATTACHMENT.equalsIgnoreCase(bodyPart.getDisposition())) {
                 InputStream is = bodyPart.getInputStream();
-                hasAttach = true;
+                hasAttach = 1;
             }
         }
         return hasAttach;
