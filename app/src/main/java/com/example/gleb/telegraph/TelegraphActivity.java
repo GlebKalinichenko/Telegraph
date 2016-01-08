@@ -7,6 +7,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.gleb.telegraph.abstracts.AbstractActivity;
 import com.example.gleb.telegraph.models.MailBox;
@@ -127,6 +128,11 @@ public class TelegraphActivity extends AbstractActivity {
             }
 
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            Toast.makeText(TelegraphActivity.this, "Add to database", Toast.LENGTH_LONG).show();
         }
     }
 
