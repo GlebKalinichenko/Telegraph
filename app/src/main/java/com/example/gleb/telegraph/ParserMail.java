@@ -2,6 +2,7 @@ package com.example.gleb.telegraph;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.widget.Toast;
 
 import com.example.gleb.telegraph.models.Attach;
 import com.example.gleb.telegraph.models.Mail;
@@ -104,22 +105,9 @@ public class ParserMail {
                             User.checkUserEmail(databaseHelper.getReadableDatabase(), emailSender),
                             MailFolder.getLastFolder(databaseHelper.getReadableDatabase()));
 
-                //get attach files from post server
-                if (hasAttach == 1){
-                    Multipart context = (Multipart) content;
-                    for (int j = 0; j < context.getCount(); j++) {
-                        BodyPart bodyPart = context.getBodyPart(j);
-                        if (Part.ATTACHMENT.equalsIgnoreCase(bodyPart.getDisposition())) {
-                            InputStream is = bodyPart.getInputStream();
-                            String nameAttach = bodyPart.getFileName();
-                            int posAttach = AttachApplication.add(is);
-                            Attach attach = new Attach(nameAttach, posAttach);
-                            //add attach to database
-                            attach.addAttach(databaseHelper.getWritableDatabase(),
-                                    Mail.getLastMail(databaseHelper.getReadableDatabase()));
-                        }
-                    }
-                }
+                //get attach from post server and save attach to database
+                if (hasAttach == 1)
+                    saveAttach(content);
             }
         else
             for (int i = messages.length - 1; i >= 0; i--){
@@ -151,24 +139,10 @@ public class ParserMail {
                             User.checkUserEmail(databaseHelper.getReadableDatabase(), emailSender),
                             MailFolder.getLastFolder(databaseHelper.getReadableDatabase()));
 
-                //get attach files from post server
-                if (hasAttach == 1){
-                    Multipart context = (Multipart) content;
-                    for (int j = 0; j < context.getCount(); j++) {
-                        BodyPart bodyPart = context.getBodyPart(j);
-                        if (Part.ATTACHMENT.equalsIgnoreCase(bodyPart.getDisposition())) {
-                            InputStream is = bodyPart.getInputStream();
-                            String nameAttach = bodyPart.getFileName();
-                            int posAttach = AttachApplication.add(is);
-                            Attach attach = new Attach(nameAttach, posAttach);
-                            //add attach to database
-                            attach.addAttach(databaseHelper.getWritableDatabase(),
-                                    Mail.getLastMail(databaseHelper.getReadableDatabase()));
-                        }
-                    }
-                }
+                //get attach from post server and save attach to database
+                if (hasAttach == 1)
+                    saveAttach(content);
             }
-
     }
 
     /**
@@ -273,5 +247,26 @@ public class ParserMail {
             }
         }
         return hasAttach;
+    }
+
+    /**
+     * Save attach files to database
+     * @param Object        Body of mail
+     * @return void
+     * */
+    private void saveAttach(Object content) throws MessagingException, IOException {
+        Multipart context = (Multipart) content;
+        for (int j = 0; j < context.getCount(); j++) {
+            BodyPart bodyPart = context.getBodyPart(j);
+            if (Part.ATTACHMENT.equalsIgnoreCase(bodyPart.getDisposition())) {
+                InputStream is = bodyPart.getInputStream();
+                String nameAttach = MimeUtility.decodeText(bodyPart.getFileName());
+                int posAttach = AttachApplication.add(is);
+                Attach attach = new Attach(nameAttach, posAttach);
+                //add attach to database
+                attach.addAttach(databaseHelper.getWritableDatabase(),
+                        Mail.getLastMail(databaseHelper.getReadableDatabase()));
+            }
+        }
     }
 }
