@@ -43,16 +43,18 @@ public class ParserMail {
     public void parseFolder(Folder[] folders) throws MessagingException, IOException {
         SQLiteDatabase sdb = databaseHelper.getWritableDatabase();
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
+        sdb.beginTransaction();
         for (Folder f : folders){
             MailFolder folder = new MailFolder(f.getName());
             folder.addFolder(sdb, MailBox.getLastAccount(db));
-
             f.open(Folder.READ_ONLY);
             FlagTerm ft = new FlagTerm(new Flags(Flags.Flag.USER), false);
             Message[] messages = f.search(ft);
             if (messages.length != 0)
                 parsePostMessage(messages);
         }
+        sdb.setTransactionSuccessful();
+        sdb.endTransaction();
         sdb.close();
         db.close();
     }
@@ -70,8 +72,10 @@ public class ParserMail {
         String body = "";
         boolean hasAttach = false;
         Mail mail;
-        if (messages.length > 5)
-            for (int i = messages.length - 1; i > messages.length - 5; i--){
+        if (messages.length > 5) {
+            SQLiteDatabase sdb = databaseHelper.getWritableDatabase();
+            sdb.beginTransaction();
+            for (int i = messages.length - 1; i > messages.length - 5; i--) {
                 emailSender = parseEmailAddress(messages[i]);
                 nameSender = parseNameEmail(messages[i]);
                 date = parseDate(messages[i]);
@@ -88,18 +92,21 @@ public class ParserMail {
                 if (User.checkUserEmail(databaseHelper.getReadableDatabase(), emailSender) == 0) {
                     User user = new User(emailSender);
                     //add user
-                    user.addUser(databaseHelper.getReadableDatabase());
+                    user.addUser(databaseHelper.getWritableDatabase());
                     //add mail at first return index last inserted user and get last folder
-                    mail.addMail(databaseHelper.getWritableDatabase(),
+                    mail.addMail(sdb,
                             User.getLastUser(databaseHelper.getReadableDatabase()),
                             MailFolder.getLastFolder(databaseHelper.getReadableDatabase()), 1);
-                }else
+                } else
                     //add mail at first return index user and get last folder
-                    mail.addMail(databaseHelper.getWritableDatabase(),
+                    mail.addMail(sdb,
                             User.checkUserEmail(databaseHelper.getReadableDatabase(), emailSender),
                             MailFolder.getLastFolder(databaseHelper.getReadableDatabase()), 1);
 
             }
+            sdb.setTransactionSuccessful();
+            sdb.endTransaction();
+        }
         else
             for (int i = messages.length - 1; i >= 0; i--){
                 emailSender = parseEmailAddress(messages[i]);
@@ -115,7 +122,6 @@ public class ParserMail {
                 }
                 mail = new Mail(emailSender, nameSender, emailReceiver, subject, body, date, hasAttach);
             }
-
     }
 
     /**
