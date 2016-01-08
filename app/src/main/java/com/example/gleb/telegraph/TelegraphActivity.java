@@ -13,6 +13,7 @@ import com.example.gleb.telegraph.abstracts.AbstractActivity;
 import com.example.gleb.telegraph.models.MailBox;
 import com.example.gleb.telegraph.models.MailFolder;
 import com.example.gleb.telegraph.models.MailSettings;
+import com.github.rahatarmanahmed.cpv.CircularProgressView;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,6 +46,7 @@ public class TelegraphActivity extends AbstractActivity {
     public static final String MAIL_SETTINGS = "MailSettings";
     private String email, password;
     private MailSettings mailSettings;
+    private CircularProgressView progressView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +56,8 @@ public class TelegraphActivity extends AbstractActivity {
         setSupportActionBar(toolbar);
         initializeWidgets();
 
+        progressView.setVisibility(View.VISIBLE);
+        progressView.startAnimation();
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,6 +74,7 @@ public class TelegraphActivity extends AbstractActivity {
         email = getIntent().getStringExtra(TelegraphActivity.EMAIL);
         password = getIntent().getStringExtra(TelegraphActivity.PASSWORD);
         mailSettings = (MailSettings) getIntent().getSerializableExtra(TelegraphActivity.MAIL_SETTINGS);
+        progressView = (CircularProgressView) findViewById(R.id.progress_view);
         databaseHelper = new DatabaseHelper(TelegraphActivity.this);
     }
 
@@ -133,6 +138,7 @@ public class TelegraphActivity extends AbstractActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             Toast.makeText(TelegraphActivity.this, "Add to database", Toast.LENGTH_LONG).show();
+            progressView.setVisibility(View.GONE);
         }
     }
 
