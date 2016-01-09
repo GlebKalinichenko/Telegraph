@@ -2,8 +2,13 @@ package com.example.gleb.telegraph.models;
 
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
 
 import com.example.gleb.telegraph.DatabaseHelper;
+
+import java.util.List;
+
+import javax.mail.Folder;
 
 /**
  * Created by Gleb on 30.12.2015.
@@ -15,9 +20,9 @@ public class Mail {
     private String subject;
     private String content;
     private String date;
-    private boolean hasAttach;
+    private int hasAttach;
 
-    public Mail(String sender, String nameSender, String receiver, String subject, String content, String date, boolean hasAttach) {
+    public Mail(String sender, String nameSender, String receiver, String subject, String content, String date, int hasAttach) {
         this.sender = sender;
         this.nameSender = nameSender;
         this.receiver = receiver;
@@ -47,6 +52,44 @@ public class Mail {
         values.put(DatabaseHelper.HAS_ATTACH, this.hasAttach);
         values.put(DatabaseHelper.STRAIGHT_INDEX, straightIndex);
         sdb.insert(DatabaseHelper.TABLE_MAILS, null, values);
+
+//        String sql = "insert into Mails (SenderUserCode, NameSender, Receiver, Subject, Content, FolderCode, Date, HasAttach, StraightIndex) values (?, ?, ?, ?, ?, ?, ?, ?, ?);";
+//        SQLiteStatement stmt = sdb.compileStatement(sql);
+//        stmt.bindLong(1, userCode);
+//        stmt.bindString(2, this.nameSender);
+//        stmt.bindString(3, this.receiver);
+//        stmt.bindString(4, this.subject);
+//        stmt.bindString(5, this.content);
+//        stmt.bindString(6, this.date);
+//        stmt.bindLong(7, folderCode);
+//        stmt.bindLong(8, this.hasAttach);
+//        stmt.bindLong(9, straightIndex);
+//        long entryID = stmt.executeInsert();
+//        stmt.clearBindings();
+    }
+
+    public static void addMails(DatabaseHelper databaseHelper, List<Mail> mails,
+            List<Long> usersCode, List<Integer> foldersCode, int straightIndex){
+        SQLiteDatabase sdb = databaseHelper.getWritableDatabase();
+        String sql = "insert into Mails (SenderUserCode, NameSender, Receiver, Subject, Content, FolderCode, Date, HasAttach, StraightIndex) values (?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        SQLiteStatement stmt = sdb.compileStatement(sql);
+        sdb.beginTransaction();
+        for (int  i = 0; i < mails.size(); i++) {
+            stmt.bindLong(1, usersCode.get(i));
+            stmt.bindString(2, mails.get(i).getNameSender());
+            stmt.bindString(3, mails.get(i).getReceiver());
+            stmt.bindString(4, mails.get(i).getSubject());
+            stmt.bindString(5, mails.get(i).getContent());
+            stmt.bindString(6, mails.get(i).getDate());
+            stmt.bindLong(7, foldersCode.get(i));
+            stmt.bindLong(8, mails.get(i).isHasAttach());
+            stmt.bindLong(9, straightIndex);
+            long entryID = stmt.executeInsert();
+            stmt.clearBindings();
+        }
+        sdb.setTransactionSuccessful();
+        sdb.endTransaction();
+        sdb.close();
     }
 
     public String getNameSender() {
@@ -97,11 +140,11 @@ public class Mail {
         this.date = date;
     }
 
-    public boolean isHasAttach() {
+    public int isHasAttach() {
         return hasAttach;
     }
 
-    public void setHasAttach(boolean hasAttach) {
+    public void setHasAttach(int hasAttach) {
         this.hasAttach = hasAttach;
     }
 }
