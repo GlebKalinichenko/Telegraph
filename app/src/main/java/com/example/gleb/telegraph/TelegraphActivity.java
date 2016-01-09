@@ -1,5 +1,6 @@
 package com.example.gleb.telegraph;
 
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -45,6 +46,7 @@ public class TelegraphActivity extends AbstractActivity {
     public static final String MAIL_SETTINGS = "MailSettings";
     private String email, password;
     private MailSettings mailSettings;
+    final long startTime = System.currentTimeMillis();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,7 +134,18 @@ public class TelegraphActivity extends AbstractActivity {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            Toast.makeText(TelegraphActivity.this, "Add to database", Toast.LENGTH_LONG).show();
+            final long endtime = System.currentTimeMillis();
+            Toast.makeText(TelegraphActivity.this, "Add to database "
+                    + String.valueOf(endtime - startTime), Toast.LENGTH_LONG).show();
+
+//            SQLiteDatabase sdb = databaseHelper.getReadableDatabase();
+//            Cursor cursor = sdb.rawQuery("Select Mails.Subject from Mails", null);
+//            List<String> subjects = new ArrayList<>();
+//            if (cursor != null && cursor.moveToFirst()) {
+//                do {
+//                    subjects.add(cursor.getString(0));
+//                } while (cursor.moveToNext());
+//            }
         }
     }
 
