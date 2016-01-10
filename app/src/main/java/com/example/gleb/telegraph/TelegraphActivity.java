@@ -143,6 +143,7 @@ public class TelegraphActivity extends AbstractActivity {
             final long endtime = System.currentTimeMillis();
             Toast.makeText(TelegraphActivity.this, "Add to database "
                     + String.valueOf(endtime - startTime), Toast.LENGTH_LONG).show();
+            progressView.setVisibility(View.INVISIBLE);
         }
     }
 
