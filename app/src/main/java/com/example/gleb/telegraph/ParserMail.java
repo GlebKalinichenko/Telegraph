@@ -1,8 +1,8 @@
 package com.example.gleb.telegraph;
 
-import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.widget.Toast;
+import android.database.sqlite.SQLiteStatement;
 
 import com.example.gleb.telegraph.models.Attach;
 import com.example.gleb.telegraph.models.Mail;
@@ -14,6 +14,7 @@ import com.example.gleb.telegraph.models.User;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.mail.Address;
@@ -46,20 +47,36 @@ public class ParserMail {
      * @return void
      * */
     public void parseFolder(Folder[] folders) throws MessagingException, IOException {
-        SQLiteDatabase sdb = databaseHelper.getWritableDatabase();
-        SQLiteDatabase db = databaseHelper.getReadableDatabase();
-        for (Folder f : folders){
-            MailFolder folder = new MailFolder(f.getName());
-            folder.addFolder(sdb, MailBox.getLastAccount(db));
+        final List<Integer> ids = MailFolder.addFolders(databaseHelper, folders);
+        final List<Thread> threads = new ArrayList<>();
+        for (int i = 0; i < folders.length; i++) {
+            final Folder f = folders[i];
+            final int finalI = i;
+            final Thread thread = new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        f.open(Folder.READ_ONLY);
+                        FlagTerm ft = new FlagTerm(new Flags(Flags.Flag.USER), false);
+                        Message[] messages = f.search(ft);
+                        if (messages.length != 0)
+                            parsePostMessage(messages, ids.get(finalI));
+                    } catch (MessagingException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
 
-            f.open(Folder.READ_ONLY);
-            FlagTerm ft = new FlagTerm(new Flags(Flags.Flag.USER), false);
-            Message[] messages = f.search(ft);
-            if (messages.length != 0)
-                parsePostMessage(messages);
+            threads.add(thread);
+            thread.start();
         }
-        sdb.close();
-        db.close();
+        for (Thread thread : threads)
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
     }
 
     /**
@@ -67,7 +84,10 @@ public class ParserMail {
      * @param Message[]        Array of message from post server
      * @return void
      * */
-    private void parsePostMessage(Message[] messages) throws MessagingException, IOException {
+    private void parsePostMessage(Message[] messages, int folderCode) throws MessagingException, IOException {
+        List<Mail> mails = new ArrayList<>();
+        List<Long> usersCode = new ArrayList<>();
+        List<Integer> foldersCode = new ArrayList<>();
         String emailSender = "";
         String nameSender = "";
         String date = "";
@@ -75,8 +95,9 @@ public class ParserMail {
         String body = "";
         int hasAttach = 0;
         Mail mail;
-        if (messages.length > 5)
-            for (int i = messages.length - 1; i > messages.length - 5; i--){
+
+        if (messages.length > 5) {
+            for (int i = messages.length - 1; i > messages.length - 5; i--) {
                 emailSender = parseEmailAddress(messages[i]);
                 nameSender = parseNameEmail(messages[i]);
                 date = parseDate(messages[i]);
@@ -88,29 +109,23 @@ public class ParserMail {
                     body = parseContentMultipart(content);
                     hasAttach = parseMultipartAttach((Multipart) content);
                 }
-                mail = new Mail(emailSender, nameSender, emailReceiver, subject, body, date,
-                        hasAttach, StraightIndex.STRAIGHT);
+                mail = new Mail(emailSender, nameSender, emailReceiver, subject, body, date, hasAttach);
+                mails.add(mail);
+
                 //if user is no in table Users add it and return his index
                 if (User.checkUserEmail(databaseHelper.getReadableDatabase(), emailSender) == 0) {
                     User user = new User(emailSender);
                     //add user
-                    user.addUser(databaseHelper.getReadableDatabase());
-                    //add mail at first return index last inserted user and get last folder
-                    mail.addMail(databaseHelper.getWritableDatabase(),
-                            User.getLastUser(databaseHelper.getReadableDatabase()),
-                            MailFolder.getLastFolder(databaseHelper.getReadableDatabase()));
-                }else
+                    usersCode.add(user.addUser(databaseHelper));
+                } else
                     //add mail at first return index user and get last folder
-                    mail.addMail(databaseHelper.getWritableDatabase(),
-                            User.checkUserEmail(databaseHelper.getReadableDatabase(), emailSender),
-                            MailFolder.getLastFolder(databaseHelper.getReadableDatabase()));
-
-                //get attach from post server and save attach to database
-                if (hasAttach == 1)
-                    saveAttach(content);
+                    usersCode.add(User.checkUserEmail(databaseHelper.getReadableDatabase(), emailSender));
+                    foldersCode.add(folderCode);
             }
-        else
-            for (int i = messages.length - 1; i >= 0; i--){
+            Mail.addMails(databaseHelper, mails, usersCode, foldersCode, 1);
+        }
+        else {
+            for (int i = messages.length - 1; i >= 0; i--) {
                 emailSender = parseEmailAddress(messages[i]);
                 nameSender = parseNameEmail(messages[i]);
                 date = parseDate(messages[i]);
@@ -122,27 +137,20 @@ public class ParserMail {
                     body = parseContentMultipart(content);
                     hasAttach = parseMultipartAttach((Multipart) content);
                 }
-                mail = new Mail(emailSender, nameSender, emailReceiver, subject, body, date,
-                        hasAttach, StraightIndex.STRAIGHT);
+                mail = new Mail(emailSender, nameSender, emailReceiver, subject, body, date, hasAttach);
+                mails.add(mail);
                 //if user is no in table Users add it and return his index
                 if (User.checkUserEmail(databaseHelper.getReadableDatabase(), emailSender) == 0) {
                     User user = new User(emailSender);
                     //add user
-                    user.addUser(databaseHelper.getReadableDatabase());
-                    //add mail at first return index last inserted user and get last folder
-                    mail.addMail(databaseHelper.getWritableDatabase(),
-                            User.getLastUser(databaseHelper.getReadableDatabase()),
-                            MailFolder.getLastFolder(databaseHelper.getReadableDatabase()));
-                }else
+                    usersCode.add(user.addUser(databaseHelper));
+                } else
                     //add mail at first return index user and get last folder
-                    mail.addMail(databaseHelper.getWritableDatabase(),
-                            User.checkUserEmail(databaseHelper.getReadableDatabase(), emailSender),
-                            MailFolder.getLastFolder(databaseHelper.getReadableDatabase()));
-
-                //get attach from post server and save attach to database
-                if (hasAttach == 1)
-                    saveAttach(content);
+                    usersCode.add(User.checkUserEmail(databaseHelper.getReadableDatabase(), emailSender));
+                foldersCode.add(folderCode);
             }
+            Mail.addMails(databaseHelper, mails, usersCode, foldersCode, 1);
+        }
     }
 
     /**

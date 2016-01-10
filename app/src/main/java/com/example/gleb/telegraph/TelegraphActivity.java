@@ -1,5 +1,6 @@
 package com.example.gleb.telegraph;
 
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.gleb.telegraph.abstracts.AbstractActivity;
+import com.example.gleb.telegraph.models.Mail;
 import com.example.gleb.telegraph.models.MailBox;
 import com.example.gleb.telegraph.models.MailFolder;
 import com.example.gleb.telegraph.models.MailSettings;
@@ -47,6 +49,7 @@ public class TelegraphActivity extends AbstractActivity {
     private String email, password;
     private MailSettings mailSettings;
     private CircularProgressView progressView;
+    final long startTime = System.currentTimeMillis();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,8 +140,9 @@ public class TelegraphActivity extends AbstractActivity {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            Toast.makeText(TelegraphActivity.this, "Add to database", Toast.LENGTH_LONG).show();
-            progressView.setVisibility(View.GONE);
+            final long endtime = System.currentTimeMillis();
+            Toast.makeText(TelegraphActivity.this, "Add to database "
+                    + String.valueOf(endtime - startTime), Toast.LENGTH_LONG).show();
         }
     }
 

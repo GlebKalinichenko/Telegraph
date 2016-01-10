@@ -3,8 +3,14 @@ package com.example.gleb.telegraph.models;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
 
 import com.example.gleb.telegraph.DatabaseHelper;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.mail.Folder;
 
 /**
  * Created by Gleb on 30.12.2015.
@@ -38,15 +44,47 @@ public class MailFolder {
     }
 
     /**
+     * Add array of folders to database
+     * @param DatabaseHelper        Helper for work with database
+     * @param Folder[]              Array of folders
+     * @return void
+     * */
+    public static List<Integer> addFolders(DatabaseHelper databaseHelper, Folder[] folders){
+        SQLiteDatabase sdb = databaseHelper.getWritableDatabase();
+        SQLiteDatabase db = databaseHelper.getReadableDatabase();
+        List<Integer> ids = new ArrayList<>();
+        String sql = "insert into Folders (NameFolder, MailBoxCode) values (?, ?);";
+        SQLiteStatement stmt = sdb.compileStatement(sql);
+        sdb.beginTransaction();
+        for (Folder f : folders){
+            MailFolder folder = new MailFolder(f.getName());
+            stmt.bindString(1, folder.getFolder());
+            //get code of folder from database
+            stmt.bindLong(2, MailBox.getLastAccount(db));
+            long entryID = stmt.executeInsert();
+            ids.add((int) entryID);
+            stmt.clearBindings();
+        }
+        sdb.setTransactionSuccessful();
+        sdb.endTransaction();
+        sdb.close();
+        db.close();
+        return ids;
+    }
+
+    /**
      * Get last index of folder in database
      * @param SQLiteDatabase        Database
      * @return int                  Code of folder in database
      * */
-    public static int getLastFolder(SQLiteDatabase sdb){
-        String query = "SELECT IdFolder from Folders order by IdFolder DESC limit 1";
-        Cursor cursor = sdb.rawQuery(query, null);
-        cursor.moveToLast();
-        int folderCode = cursor.getInt(0);
-        return folderCode;
+    public static int getFolderByName(DatabaseHelper databaseHelper, String nameFolder){
+        SQLiteDatabase sdb = databaseHelper.getReadableDatabase();
+        Cursor cursor = sdb.query(DatabaseHelper.TABLE_FOLDERS,
+                new String[]{DatabaseHelper.ID_FOLDER}, DatabaseHelper.NAME_FOLDER + "=?",
+                new String[]{nameFolder}, null, null, null, null);
+        if (cursor != null && cursor.moveToFirst())
+            return cursor.getInt(0);
+        else
+            return 0;
     }
 }
