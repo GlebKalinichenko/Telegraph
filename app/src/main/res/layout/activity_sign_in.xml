@@ -37,7 +37,7 @@
             android:inputType="textEmailAddress"
             android:drawablePadding="15dp"
             android:paddingLeft="20dp"
-            android:background="#f0f0f0"
+            android:background="@drawable/background_edit_text_sign_in"
             android:layout_marginTop="60dp"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
@@ -56,7 +56,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
-            android:background="#f0f0f0"
+            android:background="@drawable/background_edit_text_sign_in"
             android:layout_weight="0.16" />
 
         <Button
