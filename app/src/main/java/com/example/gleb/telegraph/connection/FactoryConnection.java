@@ -22,10 +22,10 @@ public class FactoryConnection {
      * */
     public Store getStore(MailSettings mailSettings, MailBox mailBox) {
         AbstractConnection connection = null;
-        if (mailBox.getProtocol().equals("imap")) {
+        if (mailBox.getUseProtocol().equals("imap")) {
             connection = new ImapConnection();
             store = connection.authentication(mailSettings, mailBox);
-        } else if (!mailBox.getProtocol().equals("imap")) {
+        } else if (!mailBox.getUseProtocol().equals("imap")) {
             connection = new Pop3Connection();
             store = connection.authentication(mailSettings, mailBox);
         }
