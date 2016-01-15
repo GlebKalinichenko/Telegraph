@@ -14,10 +14,12 @@ import java.io.Serializable;
 public class MailBox implements Serializable {
     private String email;
     private String password;
+    private String protocol;
 
-    public MailBox(String email, String password) {
+    public MailBox(String email, String password, String protocol) {
         this.email = email;
         this.password = password;
+        this.protocol = protocol;
     }
 
     /**
@@ -40,6 +42,7 @@ public class MailBox implements Serializable {
         ContentValues values = new ContentValues();
         values.put(DatabaseHelper.EMAIL_ACCOUNT, this.email);
         values.put(DatabaseHelper.PASSWORD_ACCOUNT, this.password);
+        values.put(DatabaseHelper.USE_PROTOCOL, this.protocol);
         sdb.insert(DatabaseHelper.TABLE_MAIL_BOXES, null, values);
     }
 
@@ -70,5 +73,13 @@ public class MailBox implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getProtocol() {
+        return protocol;
+    }
+
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
     }
 }
