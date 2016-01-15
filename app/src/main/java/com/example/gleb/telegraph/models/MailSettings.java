@@ -60,50 +60,50 @@ public class MailSettings implements Serializable {
         return mailSettings;
     }
 
-    /**
-     * Authentication on post server
-     * @param String        Email of account
-     * @param String        Password of account
-     * @return boolean      Is authentication complete
-     * */
-    public boolean authentication(String email, String password, boolean isImap){
-        Properties props = new Properties();
-        if (isImap) {
-            props.put("mail.imap.port", this.portImap);
-            props.put("mail.imap.socketFactory.port", this.portImap);
-            props.put("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-            props.put("mail.imap.socketFactory.fallback", "false");
-            props.setProperty("mail.store.protocol", "imaps");
-        }
-        else{
-            props.put("mail.pop3.port", this.portPop3);
-            props.put("mail.pop3.socketFactory.port", this.portPop3);
-            props.put("mail.pop3.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-            props.put("mail.pop3.socketFactory.fallback", "false");
-            props.setProperty("mail.store.protocol", "pop3");
-        }
-
-        Session session = Session.getInstance(props, null);
-        Store store = null;
-        try {
-            store = session.getStore();
-        } catch (NoSuchProviderException e) {
-            e.printStackTrace();
-            return false;
-        }
-        try {
-            if (isImap) {
-                store.connect(this.addressImap, email, password);
-            }
-            else
-                store.connect(this.addressPop3, email, password);
-        } catch (MessagingException e) {
-            e.printStackTrace();
-            return false;
-        }
-
-        return true;
-    }
+//    /**
+//     * Authentication on post server
+//     * @param String        Email of account
+//     * @param String        Password of account
+//     * @return boolean      Is authentication complete
+//     * */
+//    public boolean authentication(String email, String password, boolean isImap){
+//        Properties props = new Properties();
+//        if (isImap) {
+//            props.put("mail.imap.port", this.portImap);
+//            props.put("mail.imap.socketFactory.port", this.portImap);
+//            props.put("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+//            props.put("mail.imap.socketFactory.fallback", "false");
+//            props.setProperty("mail.store.protocol", "imaps");
+//        }
+//        else{
+//            props.put("mail.pop3.port", this.portPop3);
+//            props.put("mail.pop3.socketFactory.port", this.portPop3);
+//            props.put("mail.pop3.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+//            props.put("mail.pop3.socketFactory.fallback", "false");
+//            props.setProperty("mail.store.protocol", "pop3");
+//        }
+//
+//        Session session = Session.getInstance(props, null);
+//        Store store = null;
+//        try {
+//            store = session.getStore();
+//        } catch (NoSuchProviderException e) {
+//            e.printStackTrace();
+//            return false;
+//        }
+//        try {
+//            if (isImap) {
+//                store.connect(this.addressImap, email, password);
+//            }
+//            else
+//                store.connect(this.addressPop3, email, password);
+//        } catch (MessagingException e) {
+//            e.printStackTrace();
+//            return false;
+//        }
+//
+//        return true;
+//    }
 
     /**
      * Add settings to database
