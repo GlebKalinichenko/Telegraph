@@ -17,10 +17,10 @@ import javax.mail.Store;
 public class ImapConnection extends AbstractConnection {
 
     /**
-     * Authentication on post server
-     * @param String        Email of account
-     * @param String        Password of account
-     * @return boolean      Is authentication complete
+     * Authentication on post server by using imap protochol
+     * @param MailSettings        Settings of post server
+     * @param MailBox             Mail of box with email and password email account
+     * @return Store              Store of messages from post server
      * */
     @Override
     public Store authentication(MailSettings mailSettings, MailBox mailBox) {
