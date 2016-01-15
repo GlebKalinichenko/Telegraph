@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,6 +12,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.gleb.telegraph.abstracts.AbstractActivity;
+import com.example.gleb.telegraph.connection.FactoryConnection;
 import com.example.gleb.telegraph.models.MailBox;
 import com.example.gleb.telegraph.models.MailSettings;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
@@ -22,11 +22,10 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import javax.mail.Folder;
+import javax.mail.Store;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -53,9 +52,10 @@ public class SignInActivity extends AbstractActivity {
                 } else {
                     progressView.setVisibility(View.VISIBLE);
                     progressView.startAnimation();
+                    MailBox mailBox = new MailBox(emailEditText.getText().toString(),
+                            passwordEditText.getText().toString());
                     String namePost = MailBox.parseEmail(emailEditText.getText().toString());
-                    new LoaderAuthentication(namePost, emailEditText.getText().toString(),
-                            passwordEditText.getText().toString()).execute();
+                    new LoaderAuthentication(namePost, mailBox).execute();
                 }
             }
         });
@@ -93,13 +93,15 @@ public class SignInActivity extends AbstractActivity {
     }
 
     public class LoaderAuthentication extends AsyncTask<Void, Void, Boolean> {
-        private String urlServer, email, password;
+        private String urlServer;
         private MailSettings mailSettings;
+        private MailBox mailBox;
+        private boolean isAuthentication;
+        private Store store;
 
-        public LoaderAuthentication(String urlServer, String email, String password) {
+        public LoaderAuthentication(String urlServer, MailBox mailBox) {
             this.urlServer = urlServer;
-            this.email = email;
-            this.password = password;
+            this.mailBox = mailBox;
         }
 
         @Override
@@ -123,10 +125,23 @@ public class SignInActivity extends AbstractActivity {
             }
 
             mailSettings = MailSettings.newInstance(urlServer, doc);
-            boolean isAuthentication = mailSettings.authentication(email, password, true);
-            if (isAuthentication){
+            final FactoryConnection factoryConnection = new FactoryConnection();
+            final Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    store = factoryConnection.getStore(true, mailSettings, mailBox);
+                }
+
+            });
+            thread.start();
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            if (store != null){
+                isAuthentication = true;
                 SQLiteDatabase sdb = databaseHelper.getWritableDatabase();
-                MailBox mailBox = new MailBox(email, password);
                 //add information about account to database
                 mailBox.addAccount(sdb);
                 //get last id of account
@@ -136,6 +151,8 @@ public class SignInActivity extends AbstractActivity {
                 db.close();
                 sdb.close();
             }
+            else
+                isAuthentication = false;
 
             return isAuthentication;
         }
@@ -146,8 +163,7 @@ public class SignInActivity extends AbstractActivity {
                 Toast.makeText(getApplicationContext(), "No athentification", Toast.LENGTH_LONG).show();
             } else{
                 Intent intent = new Intent(SignInActivity.this, TelegraphActivity.class);
-                intent.putExtra(TelegraphActivity.EMAIL, email);
-                intent.putExtra(TelegraphActivity.PASSWORD, password);
+                intent.putExtra(TelegraphActivity.MAIL_BOX, mailBox);
                 intent.putExtra(TelegraphActivity.MAIL_SETTINGS, mailSettings);
                 startActivity(intent);
             }
