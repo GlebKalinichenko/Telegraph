@@ -14,12 +14,18 @@ import javax.mail.Store;
 public class FactoryConnection {
     private Store store;
 
-    public Store getStore(boolean isImap, MailSettings mailSettings, MailBox mailBox) {
+    /**
+     * Get store with messages from post server
+     * @param MailSettings        Settings of post server
+     * @param MailBox             Mail of box with email and password email account
+     * @return Store              Store of messages from post server
+     * */
+    public Store getStore(MailSettings mailSettings, MailBox mailBox) {
         AbstractConnection connection = null;
-        if (isImap) {
+        if (mailBox.getProtocol().equals("imap")) {
             connection = new ImapConnection();
             store = connection.authentication(mailSettings, mailBox);
-        } else if (!isImap) {
+        } else if (!mailBox.getProtocol().equals("imap")) {
             connection = new Pop3Connection();
             store = connection.authentication(mailSettings, mailBox);
         }
