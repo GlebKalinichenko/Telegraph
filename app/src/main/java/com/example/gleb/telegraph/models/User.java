@@ -46,10 +46,14 @@ public class User extends AbstractUser {
     public static long checkUserEmail(SQLiteDatabase sdb, String emailSender){
         Cursor cursor = sdb.query(DatabaseHelper.TABLE_USERS, new String[]{DatabaseHelper.ID_USER, DatabaseHelper.EMAIL_USER},
                 DatabaseHelper.EMAIL_USER + "=?", new String[]{emailSender}, null, null, null, null);
-        if (cursor != null && cursor.moveToFirst())
+        if (cursor != null && cursor.moveToFirst()) {
+            sdb.close();
             return cursor.getLong(0);
-        else
+        }
+        else {
+            sdb.close();
             return 0;
+        }
     }
 
     /**
