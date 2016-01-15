@@ -6,10 +6,12 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.example.gleb.telegraph.DatabaseHelper;
 
+import java.io.Serializable;
+
 /**
  * Created by Gleb on 30.12.2015.
  */
-public class MailBox {
+public class MailBox implements Serializable {
     private String email;
     private String password;
 
