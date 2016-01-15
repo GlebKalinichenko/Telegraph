@@ -1,7 +1,5 @@
 package com.example.gleb.telegraph;
 
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -11,42 +9,25 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.gleb.telegraph.abstracts.AbstractActivity;
-import com.example.gleb.telegraph.models.Mail;
+import com.example.gleb.telegraph.connection.FactoryConnection;
 import com.example.gleb.telegraph.models.MailBox;
-import com.example.gleb.telegraph.models.MailFolder;
 import com.example.gleb.telegraph.models.MailSettings;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
 
-import javax.mail.Address;
-import javax.mail.BodyPart;
-import javax.mail.Flags;
 import javax.mail.Folder;
-import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.NoSuchProviderException;
-import javax.mail.Part;
-import javax.mail.Session;
 import javax.mail.Store;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeUtility;
-import javax.mail.search.FlagTerm;
 
 /**
  * Created by Gleb on 03.01.2016.
  */
 public class TelegraphActivity extends AbstractActivity {
-    public static final String EMAIL = "Email";
-    public static final String PASSWORD = "Password";
+    public static final String MAIL_BOX = "MailBox";
     public static final String MAIL_SETTINGS = "MailSettings";
-    private String email, password;
+    private MailBox mailBox;
     private MailSettings mailSettings;
     private CircularProgressView progressView;
     final long startTime = System.currentTimeMillis();
@@ -69,64 +50,51 @@ public class TelegraphActivity extends AbstractActivity {
                         .setAction("Action", null).show();
             }
         });
-        new Loader(email, password, mailSettings, true).execute();
+        new Loader(mailBox, mailSettings, true).execute();
     }
 
     @Override
     protected void initializeWidgets() {
-        email = getIntent().getStringExtra(TelegraphActivity.EMAIL);
-        password = getIntent().getStringExtra(TelegraphActivity.PASSWORD);
+        mailBox = (MailBox) getIntent().getSerializableExtra(TelegraphActivity.MAIL_BOX);
         mailSettings = (MailSettings) getIntent().getSerializableExtra(TelegraphActivity.MAIL_SETTINGS);
         progressView = (CircularProgressView) findViewById(R.id.progress_view);
         databaseHelper = new DatabaseHelper(TelegraphActivity.this);
     }
 
     public class Loader extends AsyncTask<Void, Void, Void> {
-        private String email, password;
+        private MailBox mailBox;
         private MailSettings mailSettings;
         private boolean isImap;
+        private Store store;
 
-        public Loader(String email, String password, MailSettings mailSettings, boolean isImap) {
-            this.email = email;
-            this.password = password;
+        public Loader(MailBox mailBox, MailSettings mailSettings, boolean isImap) {
             this.mailSettings = mailSettings;
             this.isImap = isImap;
+            this.mailBox = mailBox;
         }
 
         @Override
         protected Void doInBackground(Void... params) {
-            Properties props = new Properties();
-            if (isImap) {
-                props.put("mail.imap.port", mailSettings.getPortImap());
-                props.put("mail.imap.socketFactory.port", mailSettings.getPortImap());
-                props.put("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-                props.put("mail.imap.socketFactory.fallback", "false");
-                props.setProperty("mail.store.protocol", "imaps");
-            }
-            else{
-                props.put("mail.pop3.port", mailSettings.getPortPop3());
-                props.put("mail.pop3.socketFactory.port", mailSettings.getPortPop3());
-                props.put("mail.pop3.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-                props.put("mail.pop3.socketFactory.fallback", "false");
-                props.setProperty("mail.store.protocol", "pop3");
-            }
+            final FactoryConnection factoryConnection = new FactoryConnection();
+            final Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    store = factoryConnection.getStore(true, mailSettings, mailBox);
+                }
 
-            Session session = Session.getInstance(props, null);
-            Store store = null;
+            });
+            thread.start();
             try {
-                store = session.getStore();
-            } catch (NoSuchProviderException e) {
+                thread.join();
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             try {
-                if (isImap)
-                    store.connect(mailSettings.getAddressImap(), email, password);
-                else
-                    store.connect(mailSettings.getAddressPop3(), email, password);
-                Folder[] folders = store.getDefaultFolder().list();
-                ParserMail parserMail = new ParserMail(email, databaseHelper);
-                parserMail.parseFolder(folders);
-
+                if (store != null) {
+                    Folder[] folders = store.getDefaultFolder().list();
+                    ParserMail parserMail = new ParserMail(mailBox.getEmail(), databaseHelper);
+                    parserMail.parseFolder(folders);
+                }
             } catch (MessagingException e) {
                 e.printStackTrace();
             } catch (UnsupportedEncodingException e) {
