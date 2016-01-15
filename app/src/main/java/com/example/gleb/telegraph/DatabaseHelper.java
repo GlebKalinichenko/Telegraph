@@ -18,6 +18,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String ID_MAIL_BOX = "IdMailBox";
     public static final String EMAIL_ACCOUNT = "Email";
     public static final String PASSWORD_ACCOUNT = "Password";
+    public static final String USE_PROTOCOL = "UseProtocol";
 
     /**Table MailSettings*/
     public static final String TABLE_MAIL_SETTINGS = "MailSettings";
@@ -99,7 +100,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final String CREATE_MAIL_BOXES = "CREATE TABLE " + TABLE_MAIL_BOXES + " (" +
             ID_MAIL_BOX + " INTEGER PRIMARY KEY AUTOINCREMENT," + EMAIL_ACCOUNT + " TEXT," + PASSWORD_ACCOUNT +
-            " TEXT" + ");";
+            " TEXT," + USE_PROTOCOL + " TEXT" +");";
 
     public static final String CREATE_MAIL_SETTINGS = "CREATE TABLE " + TABLE_MAIL_SETTINGS + " (" +
             ID_MAIL_SETTING + " INTEGER PRIMARY KEY AUTOINCREMENT," + NAME_POST_SERVER + " TEXT," +
