@@ -16,6 +16,12 @@ import javax.mail.Store;
  */
 public class Pop3Connection extends AbstractConnection {
 
+    /**
+     * Authentication on post server by using pop3 protochol
+     * @param MailSettings        Settings of post server
+     * @param MailBox             Mail of box with email and password email account
+     * @return Store              Store of messages from post server
+     * */
     @Override
     public Store authentication(MailSettings mailSettings, MailBox mailBox) {
         Properties props = new Properties();
