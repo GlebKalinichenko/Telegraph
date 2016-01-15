@@ -50,7 +50,7 @@ public class TelegraphActivity extends AbstractActivity {
                         .setAction("Action", null).show();
             }
         });
-        new Loader(mailBox, mailSettings, true).execute();
+        new Loader(mailBox, mailSettings).execute();
     }
 
     @Override
@@ -64,12 +64,10 @@ public class TelegraphActivity extends AbstractActivity {
     public class Loader extends AsyncTask<Void, Void, Void> {
         private MailBox mailBox;
         private MailSettings mailSettings;
-        private boolean isImap;
         private Store store;
 
-        public Loader(MailBox mailBox, MailSettings mailSettings, boolean isImap) {
+        public Loader(MailBox mailBox, MailSettings mailSettings) {
             this.mailSettings = mailSettings;
-            this.isImap = isImap;
             this.mailBox = mailBox;
         }
 
@@ -79,7 +77,7 @@ public class TelegraphActivity extends AbstractActivity {
             final Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    store = factoryConnection.getStore(true, mailSettings, mailBox);
+                    store = factoryConnection.getStore(mailSettings, mailBox);
                 }
 
             });
