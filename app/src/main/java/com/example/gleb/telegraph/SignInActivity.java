@@ -53,7 +53,7 @@ public class SignInActivity extends AbstractActivity {
                     progressView.setVisibility(View.VISIBLE);
                     progressView.startAnimation();
                     MailBox mailBox = new MailBox(emailEditText.getText().toString(),
-                            passwordEditText.getText().toString());
+                            passwordEditText.getText().toString(), "imap");
                     String namePost = MailBox.parseEmail(emailEditText.getText().toString());
                     new LoaderAuthentication(namePost, mailBox).execute();
                 }
@@ -129,7 +129,7 @@ public class SignInActivity extends AbstractActivity {
             final Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    store = factoryConnection.getStore(true, mailSettings, mailBox);
+                    store = factoryConnection.getStore(mailSettings, mailBox);
                 }
 
             });
