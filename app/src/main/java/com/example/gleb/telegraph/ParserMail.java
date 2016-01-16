@@ -88,6 +88,7 @@ public class ParserMail {
         List<Mail> mails = new ArrayList<>();
         List<Long> usersCode = new ArrayList<>();
         List<Integer> foldersCode = new ArrayList<>();
+        List<List<Attach>> attachs = new ArrayList<>();
         String emailSender = "";
         String nameSender = "";
         String date = "";
@@ -108,6 +109,8 @@ public class ParserMail {
                 else if (content instanceof Multipart) {
                     body = parseContentMultipart(content);
                     hasAttach = parseMultipartAttach((Multipart) content);
+                    if (hasAttach == 1)
+                        attachs.add(saveAttach(content));
                 }
                 mail = new Mail(emailSender, nameSender, emailReceiver, subject, body, date, hasAttach);
                 mails.add(mail);
@@ -122,7 +125,7 @@ public class ParserMail {
                     usersCode.add(User.checkUserEmail(databaseHelper.getReadableDatabase(), emailSender));
                     foldersCode.add(folderCode);
             }
-            Mail.addMails(databaseHelper, mails, usersCode, foldersCode, 1);
+            Mail.addMails(databaseHelper, mails, usersCode, foldersCode, StraightIndex.STRAIGHT, attachs);
         }
         else {
             for (int i = messages.length - 1; i >= 0; i--) {
@@ -136,9 +139,12 @@ public class ParserMail {
                 else if (content instanceof Multipart) {
                     body = parseContentMultipart(content);
                     hasAttach = parseMultipartAttach((Multipart) content);
+                    if (hasAttach == 1)
+                        attachs.add(saveAttach(content));
                 }
                 mail = new Mail(emailSender, nameSender, emailReceiver, subject, body, date, hasAttach);
                 mails.add(mail);
+
                 //if user is no in table Users add it and return his index
                 if (User.checkUserEmail(databaseHelper.getReadableDatabase(), emailSender) == 0) {
                     User user = new User(emailSender);
@@ -149,7 +155,7 @@ public class ParserMail {
                     usersCode.add(User.checkUserEmail(databaseHelper.getReadableDatabase(), emailSender));
                 foldersCode.add(folderCode);
             }
-            Mail.addMails(databaseHelper, mails, usersCode, foldersCode, 1);
+            Mail.addMails(databaseHelper, mails, usersCode, foldersCode, StraightIndex.STRAIGHT, attachs);
         }
     }
 
@@ -262,7 +268,8 @@ public class ParserMail {
      * @param Object        Body of mail
      * @return void
      * */
-    private void saveAttach(Object content) throws MessagingException, IOException {
+    private List<Attach> saveAttach(Object content) throws MessagingException, IOException {
+        List<Attach> attachs = new ArrayList<>();
         Multipart context = (Multipart) content;
         for (int j = 0; j < context.getCount(); j++) {
             BodyPart bodyPart = context.getBodyPart(j);
@@ -271,10 +278,9 @@ public class ParserMail {
                 String nameAttach = MimeUtility.decodeText(bodyPart.getFileName());
                 int posAttach = AttachApplication.add(is);
                 Attach attach = new Attach(nameAttach, posAttach);
-                //add attach to database
-                attach.addAttach(databaseHelper.getWritableDatabase(),
-                        Mail.getLastMail(databaseHelper.getReadableDatabase()));
+                attachs.add(attach);
             }
         }
+        return attachs;
     }
 }
