@@ -35,42 +35,6 @@ public class Mail {
     }
 
     /**
-     * Add mail to database
-     * @param SQLiteDatabase        Database
-     * @param int                   Id user from table Users for email sender
-     * @param int                   Id folder
-     * @param int                   Type mail 0 is sent mail 1 is received mail
-     * @return void
-     * */
-//    public void addMail(SQLiteDatabase sdb, int userCode, int folderCode){
-//        ContentValues values = new ContentValues();
-//        values.put(DatabaseHelper.SENDER_USER_CODE, userCode);
-//        values.put(DatabaseHelper.NAME_SENDER, this.nameSender);
-//        values.put(DatabaseHelper.RECEIVER, this.receiver);
-//        values.put(DatabaseHelper.SUBJECT, this.subject);
-//        values.put(DatabaseHelper.CONTENT, this.content);
-//        values.put(DatabaseHelper.DATE, this.date);
-//        values.put(DatabaseHelper.FOLDER_CODE, folderCode);
-//        values.put(DatabaseHelper.HAS_ATTACH, this.hasAttach);
-//        values.put(DatabaseHelper.STRAIGHT_INDEX, this.straightIndex);
-//        sdb.insert(DatabaseHelper.TABLE_MAILS, null, values);
-//
-////        String sql = "insert into Mails (SenderUserCode, NameSender, Receiver, Subject, Content, FolderCode, Date, HasAttach, StraightIndex) values (?, ?, ?, ?, ?, ?, ?, ?, ?);";
-////        SQLiteStatement stmt = sdb.compileStatement(sql);
-////        stmt.bindLong(1, userCode);
-////        stmt.bindString(2, this.nameSender);
-////        stmt.bindString(3, this.receiver);
-////        stmt.bindString(4, this.subject);
-////        stmt.bindString(5, this.content);
-////        stmt.bindString(6, this.date);
-////        stmt.bindLong(7, folderCode);
-////        stmt.bindLong(8, this.hasAttach);
-////        stmt.bindLong(9, straightIndex);
-////        long entryID = stmt.executeInsert();
-////        stmt.clearBindings();
-//    }
-
-    /**
      * Add array of mails to database
      * @param SQLiteDatabase        Database
      * @param int                   Id user from table Users for email sender
