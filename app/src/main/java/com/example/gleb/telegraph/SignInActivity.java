@@ -15,6 +15,7 @@ import com.example.gleb.telegraph.abstracts.AbstractActivity;
 import com.example.gleb.telegraph.connection.FactoryConnection;
 import com.example.gleb.telegraph.models.MailBox;
 import com.example.gleb.telegraph.models.MailSettings;
+import com.example.gleb.telegraph.networkconnection.NetworkStateChanged;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
 
 import org.w3c.dom.Document;
@@ -30,6 +31,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import de.greenrobot.event.EventBus;
+
 public class SignInActivity extends AbstractActivity {
     public static final String TAG = "Tag";
     private Button signInButton;
@@ -43,6 +46,7 @@ public class SignInActivity extends AbstractActivity {
         setContentView(R.layout.activity_sign_in);
 
         initializeWidgets();
+        EventBus.getDefault().register(this);
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -59,6 +63,18 @@ public class SignInActivity extends AbstractActivity {
                 }
             }
         });
+    }
+
+    /**
+     * Handle of change wifi connection
+     * @param NetworkStateChanged        Event for check state wifi connection
+     * @return void
+     * */
+    public void onEvent(NetworkStateChanged event) {
+        if (!event.isInternetConnected()) {
+            Toast.makeText(SignInActivity.this, getResources().getString(R.string.wifi_disconnected),
+                    Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
