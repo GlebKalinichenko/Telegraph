@@ -5,6 +5,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import com.example.gleb.telegraph.DatabaseHelper;
+
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,8 +70,17 @@ public class Mail {
 ////        stmt.clearBindings();
 //    }
 
+    /**
+     * Add array of mails to database
+     * @param SQLiteDatabase        Database
+     * @param int                   Id user from table Users for email sender
+     * @param int                   Id folder
+     * @param int                   Type mail 0 is sent mail 1 is received mail
+     * @param List<List<Attach>>    Array of attach for each mail
+     * @return void
+     * */
     public static void addMails(DatabaseHelper databaseHelper, List<Mail> mails,
-            List<Long> usersCode, List<Integer> foldersCode, int straightIndex){
+            List<Long> usersCode, List<Integer> foldersCode, int straightIndex, List<List<Attach>> attachs){
         SQLiteDatabase sdb = databaseHelper.getWritableDatabase();
         String sql = "insert into Mails (SenderUserCode, NameSender, Receiver, Subject, Content, FolderCode, Date, HasAttach, StraightIndex) values (?, ?, ?, ?, ?, ?, ?, ?, ?);";
         SQLiteStatement stmt = sdb.compileStatement(sql);
@@ -85,6 +96,17 @@ public class Mail {
             stmt.bindLong(8, mails.get(i).isHasAttach());
             stmt.bindLong(9, straightIndex);
             long entryID = stmt.executeInsert();
+            //is has mail attach
+            if (mails.get(i).isHasAttach() == 1){
+                //array of attachs of mail
+                List<Attach> listAttachs = attachs.get(0);
+                //delete array of attach for mail from common store of array attachs
+                attachs.remove(0);
+                for (Attach attach: listAttachs) {
+                    //add list attach of mail to database
+                    attach.addAttach(databaseHelper.getWritableDatabase(), (int) entryID);
+                }
+            }
             stmt.clearBindings();
         }
         sdb.setTransactionSuccessful();
