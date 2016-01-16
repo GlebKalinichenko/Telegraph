@@ -26,4 +26,5 @@ dependencies {
     compile 'com.android.support:design:23.1.1'
     compile 'com.github.rahatarmanahmed:circularprogressview:2.4.0'
     compile files('libs/activation.jar')
+    compile 'de.greenrobot:eventbus:2.4.0'
 }
