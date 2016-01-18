@@ -46,7 +46,9 @@ public class Mail {
     public static void addMails(DatabaseHelper databaseHelper, List<Mail> mails,
             List<Long> usersCode, List<Integer> foldersCode, int straightIndex, List<List<Attach>> attachs){
         SQLiteDatabase sdb = databaseHelper.getWritableDatabase();
-        String sql = "insert into Mails (SenderUserCode, NameSender, Receiver, Subject, Content, FolderCode, Date, HasAttach, StraightIndex) values (?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        String sql = "insert into Mails (SenderUserCode, NameSender, " +
+                "Receiver, Subject, Content, FolderCode, Date, HasAttach, StraightIndex) " +
+                "values (?, ?, ?, ?, ?, ?, ?, ?, ?);";
         SQLiteStatement stmt = sdb.compileStatement(sql);
         sdb.beginTransaction();
         for (int  i = 0; i < mails.size(); i++) {
@@ -68,7 +70,7 @@ public class Mail {
                 attachs.remove(0);
                 for (Attach attach: listAttachs) {
                     //add list attach of mail to database
-                    attach.addAttach(databaseHelper.getWritableDatabase(), (int) entryID);
+                    attach.addAttachs(databaseHelper.getWritableDatabase(), (int) entryID, listAttachs);
                 }
             }
             stmt.clearBindings();
