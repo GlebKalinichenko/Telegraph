@@ -14,6 +14,9 @@ import java.util.List;
  * Created by Gleb on 30.12.2015.
  */
 public class Mail {
+    public static final String INSERT_MAIL = "insert into Mails (SenderUserCode, NameSender, " +
+            "Receiver, Subject, Content, FolderCode, Date, HasAttach, StraightIndex) " +
+            "values (?, ?, ?, ?, ?, ?, ?, ?, ?);";
     private String sender;
     private String nameSender;
     private String receiver;
@@ -21,7 +24,6 @@ public class Mail {
     private String content;
     private String date;
     private int hasAttach;
-    //private int straightIndex;
 
     public Mail(String sender, String nameSender, String receiver, String subject, String content, String date, int hasAttach) {
         this.sender = sender;
@@ -31,7 +33,6 @@ public class Mail {
         this.content = content;
         this.date = date;
         this.hasAttach = hasAttach;
-        //this.straightIndex = straightIndex;
     }
 
     /**
@@ -46,10 +47,7 @@ public class Mail {
     public static void addMails(DatabaseHelper databaseHelper, List<Mail> mails,
             List<Long> usersCode, List<Integer> foldersCode, int straightIndex, List<List<Attach>> attachs){
         SQLiteDatabase sdb = databaseHelper.getWritableDatabase();
-        String sql = "insert into Mails (SenderUserCode, NameSender, " +
-                "Receiver, Subject, Content, FolderCode, Date, HasAttach, StraightIndex) " +
-                "values (?, ?, ?, ?, ?, ?, ?, ?, ?);";
-        SQLiteStatement stmt = sdb.compileStatement(sql);
+        SQLiteStatement stmt = sdb.compileStatement(Mail.INSERT_MAIL);
         sdb.beginTransaction();
         for (int  i = 0; i < mails.size(); i++) {
             stmt.bindLong(1, usersCode.get(i));
