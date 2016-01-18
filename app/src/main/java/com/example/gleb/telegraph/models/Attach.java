@@ -3,6 +3,7 @@ package com.example.gleb.telegraph.models;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
 
 import com.example.gleb.telegraph.DatabaseHelper;
 
@@ -13,6 +14,8 @@ import java.util.List;
  * Created by Gleb on 30.12.2015.
  */
 public class Attach {
+    public static final String INSERT_SQL = "insert into Attachs (NameAttach, NumPositionOfAttach, MailCode) " +
+            "values (?, ?, ?);";
     private String nameAttachs;
     private int numPositions;
 
@@ -22,17 +25,20 @@ public class Attach {
     }
 
     /**
-     * Add attach to database
+     * Add array attach to database
      * @param SQLiteDatabase        Database
      * @param int                   Id mail
+     * @param List<Attach>          Array of attach for mail
      * @return void
      * */
-    public void addAttach(SQLiteDatabase sdb, int mailCode){
-        ContentValues values = new ContentValues();
-        values.put(DatabaseHelper.NAME_ATTACH, this.nameAttachs);
-        values.put(DatabaseHelper.NUM_POSITION, this.numPositions);
-        values.put(DatabaseHelper.MAIL_CODE, mailCode);
-        sdb.insert(DatabaseHelper.TABLE_ATTACHS, null, values);
+    public static void addAttachs(SQLiteDatabase sdb, int mailCode, List<Attach> attachs){
+        SQLiteStatement stmt = sdb.compileStatement(Attach.INSERT_SQL);
+        for (Attach attach : attachs) {
+            stmt.bindString(1, attach.getNameAttachs());
+            stmt.bindLong(2, attach.getNumPositions());
+            stmt.bindLong(3, mailCode);
+            stmt.clearBindings();
+        }
     }
 
     /**
