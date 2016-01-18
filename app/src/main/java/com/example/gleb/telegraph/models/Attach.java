@@ -1,11 +1,8 @@
 package com.example.gleb.telegraph.models;
 
-import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
-
-import com.example.gleb.telegraph.DatabaseHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +11,7 @@ import java.util.List;
  * Created by Gleb on 30.12.2015.
  */
 public class Attach {
-    public static final String INSERT_SQL = "insert into Attachs (NameAttach, NumPositionOfAttach, MailCode) " +
+    public static final String INSERT_ATTACH = "insert into Attachs (NameAttach, NumPositionOfAttach, MailCode) " +
             "values (?, ?, ?);";
     private String nameAttachs;
     private int numPositions;
@@ -32,7 +29,7 @@ public class Attach {
      * @return void
      * */
     public static void addAttachs(SQLiteDatabase sdb, int mailCode, List<Attach> attachs){
-        SQLiteStatement stmt = sdb.compileStatement(Attach.INSERT_SQL);
+        SQLiteStatement stmt = sdb.compileStatement(Attach.INSERT_ATTACH);
         for (Attach attach : attachs) {
             stmt.bindString(1, attach.getNameAttachs());
             stmt.bindLong(2, attach.getNumPositions());
