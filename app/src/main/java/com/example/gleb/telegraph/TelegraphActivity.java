@@ -4,8 +4,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.gleb.telegraph.abstracts.AbstractActivity;
@@ -59,6 +61,8 @@ public class TelegraphActivity extends AbstractActivity {
         mailSettings = (MailSettings) getIntent().getSerializableExtra(TelegraphActivity.MAIL_SETTINGS);
         progressView = (CircularProgressView) findViewById(R.id.progress_view);
         databaseHelper = new DatabaseHelper(TelegraphActivity.this);
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        navDrawerListView = (ListView) findViewById(R.id.list_slidermenu);
     }
 
     public class Loader extends AsyncTask<Void, Void, Void> {
