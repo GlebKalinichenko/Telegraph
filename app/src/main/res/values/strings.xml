@@ -4,6 +4,11 @@
     <string name="wifi_disconnected">Wifi is disconnected</string>
     <string-array name="nav_drawer_items">
         <item >Home</item>
+        <item >Inbox</item>
+        <item >Outbox</item>
+        <item >Trash</item>
+        <item >Spam</item>
+        <item >Deleted</item>
         <item >Create folder</item>
         <item >With attach</item>
         <item >Settings</item>
@@ -11,9 +16,14 @@
         <item >Logout</item>
     </string-array>
     <array name="nav_drawer_icons">
-        <item>@drawable/splash</item>
-        <item>@drawable/splash</item>
-        <item>@drawable/splash</item>
+        <item>@drawable/home</item>
+        <item>@drawable/inbox</item>
+        <item>@drawable/outbox</item>
+        <item>@drawable/trash</item>
+        <item>@drawable/spam</item>
+        <item>@drawable/deleted</item>
+        <item>@drawable/folder</item>
+        <item>@drawable/search_attach</item>
         <item>@drawable/ic_setting</item>
         <item>@drawable/ic_about</item>
         <item>@drawable/ic_logout</item>
