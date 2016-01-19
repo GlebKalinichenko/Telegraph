@@ -247,7 +247,7 @@ public class ParserMail {
     }
 
     /**
-     * Get attach files from mail
+     * Get search_attach files from mail
      * @param Multipart        Body of mail
      * @return void
      * */
@@ -264,7 +264,7 @@ public class ParserMail {
     }
 
     /**
-     * Save attach files to database
+     * Save search_attach files to database
      * @param Object        Body of mail
      * @return void
      * */
