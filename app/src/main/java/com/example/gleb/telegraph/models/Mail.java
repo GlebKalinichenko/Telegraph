@@ -41,7 +41,7 @@ public class Mail {
      * @param int                   Id user from table Users for email sender
      * @param int                   Id folder
      * @param int                   Type mail 0 is sent mail 1 is received mail
-     * @param List<List<Attach>>    Array of attach for each mail
+     * @param List<List<Attach>>    Array of search_attach for each mail
      * @return void
      * */
     public static void addMails(DatabaseHelper databaseHelper, List<Mail> mails,
@@ -60,14 +60,14 @@ public class Mail {
             stmt.bindLong(8, mails.get(i).isHasAttach());
             stmt.bindLong(9, straightIndex);
             long entryID = stmt.executeInsert();
-            //is has mail attach
+            //is has mail search_attach
             if (mails.get(i).isHasAttach() == 1){
                 //array of attachs of mail
                 List<Attach> listAttachs = attachs.get(0);
-                //delete array of attach for mail from common store of array attachs
+                //delete array of search_attach for mail from common store of array attachs
                 attachs.remove(0);
                 for (Attach attach: listAttachs) {
-                    //add list attach of mail to database
+                    //add list search_attach of mail to database
                     attach.addAttachs(databaseHelper.getWritableDatabase(), (int) entryID, listAttachs);
                 }
             }
