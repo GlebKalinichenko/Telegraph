@@ -22,10 +22,10 @@ public class Attach {
     }
 
     /**
-     * Add array attach to database
+     * Add array search_attach to database
      * @param SQLiteDatabase        Database
      * @param int                   Id mail
-     * @param List<Attach>          Array of attach for mail
+     * @param List<Attach>          Array of search_attach for mail
      * @return void
      * */
     public static void addAttachs(SQLiteDatabase sdb, int mailCode, List<Attach> attachs){
@@ -39,7 +39,7 @@ public class Attach {
     }
 
     /**
-     * Select all attach
+     * Select all search_attach
      * @param SQLiteDatabase        Database
      * @return List<Attach>         List of attachs
      * */
