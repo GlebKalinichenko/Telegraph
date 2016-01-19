@@ -1,11 +1,15 @@
 package com.example.gleb.telegraph;
 
+import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -14,10 +18,13 @@ import com.example.gleb.telegraph.abstracts.AbstractActivity;
 import com.example.gleb.telegraph.connection.FactoryConnection;
 import com.example.gleb.telegraph.models.MailBox;
 import com.example.gleb.telegraph.models.MailSettings;
+import com.example.gleb.telegraph.navigationdrawer.NavDrawerAdapter;
+import com.example.gleb.telegraph.navigationdrawer.NavDrawerItem;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 
 import javax.mail.Folder;
 import javax.mail.MessagingException;
@@ -32,13 +39,14 @@ public class TelegraphActivity extends AbstractActivity {
     private MailBox mailBox;
     private MailSettings mailSettings;
     private CircularProgressView progressView;
+    private Toolbar toolbar;
     final long startTime = System.currentTimeMillis();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_telegraph);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         initializeWidgets();
 
@@ -55,6 +63,11 @@ public class TelegraphActivity extends AbstractActivity {
         new Loader(mailBox, mailSettings).execute();
     }
 
+    /**
+     * Initialize widgets
+     * @param void
+     * @return void
+     * */
     @Override
     protected void initializeWidgets() {
         mailBox = (MailBox) getIntent().getSerializableExtra(TelegraphActivity.MAIL_BOX);
@@ -63,6 +76,63 @@ public class TelegraphActivity extends AbstractActivity {
         databaseHelper = new DatabaseHelper(TelegraphActivity.this);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         navDrawerListView = (ListView) findViewById(R.id.list_slidermenu);
+        // load slide menu items
+        navMenuTitles = getResources().getStringArray(R.array.nav_drawer_items);
+        // nav drawer icons from resources
+        navMenuIcons = getResources().obtainTypedArray(R.array.nav_drawer_icons);
+        initializeNavigationDrawer();
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+    }
+
+    /**
+     * Initialize navigation drawer
+     * @param void
+     * @return void
+     * */
+    private void initializeNavigationDrawer(){
+        ArrayList<NavDrawerItem> navDrawerItems = new ArrayList<NavDrawerItem>();
+        navDrawerItems.add(new NavDrawerItem(navMenuTitles[0], navMenuIcons.getResourceId(0, -1)));
+        navDrawerItems.add(new NavDrawerItem(navMenuTitles[1], navMenuIcons.getResourceId(1, -1)));
+        navDrawerItems.add(new NavDrawerItem(navMenuTitles[2], navMenuIcons.getResourceId(2, -1)));
+        navDrawerItems.add(new NavDrawerItem(navMenuTitles[3], navMenuIcons.getResourceId(3, -1), true, "22"));
+        navDrawerItems.add(new NavDrawerItem(navMenuTitles[4], navMenuIcons.getResourceId(4, -1)));
+        navDrawerItems.add(new NavDrawerItem(navMenuTitles[5], navMenuIcons.getResourceId(5, -1), true, "50+"));
+
+        navMenuIcons.recycle();
+        LayoutInflater inflater = getLayoutInflater();
+        View listHeaderView = inflater.inflate(R.layout.nav_drawer_header, null, false);
+        navDrawerListView.addHeaderView(listHeaderView);
+        NavDrawerAdapter adapter = new NavDrawerAdapter(getApplicationContext(), navDrawerItems);
+        navDrawerListView.setAdapter(adapter);
+
+        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.app_name,
+                R.string.app_name){
+            public void onDrawerClosed(View view) {
+                invalidateOptionsMenu();
+            }
+
+            public void onDrawerOpened(View drawerView) {
+                invalidateOptionsMenu();
+            }
+        };
+
+        drawerToggle.setDrawerIndicatorEnabled(true);
+        drawerLayout.setDrawerListener(drawerToggle);
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        drawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        drawerToggle.onConfigurationChanged(newConfig);
     }
 
     public class Loader extends AsyncTask<Void, Void, Void> {
@@ -116,161 +186,4 @@ public class TelegraphActivity extends AbstractActivity {
             progressView.setVisibility(View.INVISIBLE);
         }
     }
-
-//    /**
-//     * Get mails from folders
-//     * @param Folder[]        Array of folder from post server
-//     * @return void
-//     * */
-//    private void parseFolder(Folder[] folders) throws MessagingException, IOException {
-//        SQLiteDatabase sdb = databaseHelper.getWritableDatabase();
-//        SQLiteDatabase db = databaseHelper.getReadableDatabase();
-//        for (Folder f : folders){
-//            MailFolder folder = new MailFolder(f.getName());
-//            folder.addFolder(sdb, MailBox.getLastAccount(db));
-//
-//            f.open(Folder.READ_ONLY);
-//            FlagTerm ft = new FlagTerm(new Flags(Flags.Flag.USER), false);
-//            Message[] messages = f.search(ft);
-//            if (messages.length != 0)
-//                parsePostMessage(messages);
-//        }
-//        sdb.close();
-//        db.close();
-//    }
-//
-//    /**
-//     * Parse mail from message
-//     * @param Message[]        Array of message from post server
-//     * @return void
-//     * */
-//    private void parsePostMessage(Message[] messages) throws MessagingException, IOException {
-//        List<String> emails = new ArrayList<>();
-//        List<String> names = new ArrayList<>();
-//        List<String> dates = new ArrayList<>();
-//        List<String> subjects = new ArrayList<>();
-//        List<String> bodies = new ArrayList<>();
-//        if (messages.length > 5)
-//            for (int i = messages.length - 1; i > messages.length - 5; i--){
-//                emails.add(parseEmailAddress(messages[i]));
-//                names.add(parseNameEmail(messages[i]));
-//                dates.add(parseDate(messages[i]));
-//                subjects.add(parseSubject(messages[i]));
-//                Object content = new MimeMessage((MimeMessage) messages[i]).getContent();
-//                if (content instanceof String)
-//                    bodies.add(parseContentString(content));
-//                else if (content instanceof  Multipart)
-//                    bodies.add(parseContentMultipart(content));
-//            }
-//        else
-//            for (int i = messages.length - 1; i >= 0; i--){
-//                emails.add(parseEmailAddress(messages[i]));
-//                names.add(parseNameEmail(messages[i]));
-//                dates.add(parseDate(messages[i]));
-//                subjects.add(parseSubject(messages[i]));
-//            }
-//
-//    }
-//
-//    /**
-//     * Get email of sender
-//     * @param Message        Message with email of sender
-//     * @return String        Email of sender
-//     * */
-//    private String parseEmailAddress(Message message) throws MessagingException, UnsupportedEncodingException {
-//        String email = "";
-//        Address[] in = message.getFrom();
-//        for (Address address : in) {
-//            String decodeAddress = MimeUtility.decodeText(address.toString());
-//            if (decodeAddress.indexOf("<") == -1 && decodeAddress.indexOf(">") == -1)
-//                email = decodeAddress;
-//            else
-//                //add email of sender of mail
-//                email = decodeAddress.substring(decodeAddress.indexOf("<"), decodeAddress.indexOf(">") + 1);
-//        }
-//        return email;
-//    }
-//
-//    /**
-//     * Get name of sender
-//     * @param Message        Message with name of sender
-//     * @return String        Name of sender
-//     * */
-//    private String parseNameEmail(Message message) throws MessagingException, UnsupportedEncodingException {
-//        String name = "";
-//        Address[] in = message.getFrom();
-//        for (Address address : in) {
-//            String decodeAddress = MimeUtility.decodeText(address.toString());
-//            if (decodeAddress.indexOf("<") == -1 && decodeAddress.indexOf(">") == -1)
-//                name = decodeAddress;
-//            else
-//                //add name of sender of mail
-//                name = decodeAddress.substring(0, decodeAddress.indexOf("<"));
-//        }
-//        return name;
-//    }
-//
-//    /**
-//     * Get send date from mail
-//     * @param Message        Message with mail from post server
-//     * @return String        Send date of mail
-//     * */
-//    private String parseDate(Message message) throws MessagingException, UnsupportedEncodingException {
-//        String date = "";
-//        String[] parts = message.getSentDate().toString().split(" ");
-//        date = String.valueOf(parts[3] + message.getSentDate().getDate()) + "."
-//                + (message.getSentDate().getMonth() + 1) + "."
-//                + (message.getSentDate().getYear() % 100);
-//        return date;
-//    }
-//
-//    /**
-//     * Get subject from mail
-//     * @param Message        Subject of mail from post server
-//     * @return String        Subject of mail
-//     * */
-//    private String parseSubject(Message message) throws MessagingException, UnsupportedEncodingException {
-//        String subject = "";
-//        subject = message.getSubject();
-//        return subject;
-//    }
-//
-//    /**
-//     * Get string body of mail
-//     * @param Object         Content object
-//     * @return String        Content body of mail
-//     * */
-//    private String parseContentString(Object content) throws MessagingException, UnsupportedEncodingException {
-//        String body = "";
-//        body = (String) content;
-//        return body;
-//    }
-//
-//    /**
-//     * Get multipart content of mail
-//     * @param Object         Content object
-//     * @return String        Content body of mail
-//     * */
-//    private String parseContentMultipart(Object content) throws MessagingException, IOException {
-//        String body = "";
-//        Multipart mp = (Multipart) content;
-//        BodyPart bp = mp.getBodyPart(0);
-//        body = bp.getContent().toString();
-//        parseMultipartAttach(mp);
-//        return body;
-//    }
-//
-//    /**
-//     * Get attach files from mail
-//     * @param Multipart        Body of mail
-//     * @return void
-//     * */
-//    private void parseMultipartAttach(Multipart content) throws MessagingException, IOException {
-//        for (int j = 0; j < content.getCount(); j++) {
-//            BodyPart bodyPart = content.getBodyPart(j);
-//            if (Part.ATTACHMENT.equalsIgnoreCase(bodyPart.getDisposition())) {
-//                InputStream is = bodyPart.getInputStream();
-//            }
-//        }
-//    }
 }
