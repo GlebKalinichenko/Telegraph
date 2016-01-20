@@ -105,4 +105,17 @@ public class MailFolder {
         }
         return folders;
     }
+
+    /**
+     * Get name of folders for show on view pager
+     * @param Folder[]              Array of folders
+     * @return List<String>         Array names of folders
+     * */
+    public static List<String> folderToString(Folder[] arrayFolders){
+        List<String> folders = new ArrayList<>();
+        for (Folder folder : arrayFolders) {
+            folders.add(folder.getName());
+        }
+        return folders;
+    }
 }
