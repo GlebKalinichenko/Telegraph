@@ -5,11 +5,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -17,25 +17,22 @@ import android.widget.Toast;
 
 import com.example.gleb.telegraph.abstracts.AbstractActivity;
 import com.example.gleb.telegraph.connection.FactoryConnection;
-import com.example.gleb.telegraph.models.Mail;
 import com.example.gleb.telegraph.models.MailBox;
 import com.example.gleb.telegraph.models.MailSettings;
 import com.example.gleb.telegraph.navigationdrawer.NavDrawerAdapter;
 import com.example.gleb.telegraph.navigationdrawer.NavDrawerItem;
+import com.example.gleb.telegraph.pager.MailViewPagerAdapter;
+import com.example.gleb.telegraph.slide.SlidingTabLayout;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.List;
 
-import javax.mail.Address;
 import javax.mail.Folder;
-import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Store;
 import javax.mail.internet.AddressException;
-import javax.mail.internet.MimeUtility;
 
 /**
  * Created by Gleb on 03.01.2016.
@@ -47,6 +44,9 @@ public class TelegraphActivity extends AbstractActivity {
     private MailSettings mailSettings;
     private CircularProgressView progressView;
     private Toolbar toolbar;
+    private MailViewPagerAdapter viewPagerAdapter;
+    private ViewPager viewPager;
+    private SlidingTabLayout tabs;
     final long startTime = System.currentTimeMillis();
 
     @Override
@@ -87,6 +87,8 @@ public class TelegraphActivity extends AbstractActivity {
         databaseHelper = new DatabaseHelper(TelegraphActivity.this);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         navDrawerListView = (ListView) findViewById(R.id.list_slidermenu);
+        viewPager = (ViewPager) findViewById(R.id.pager);
+        tabs = (SlidingTabLayout) findViewById(R.id.tabs);
         // load slide menu items
         navMenuTitles = getResources().getStringArray(R.array.nav_drawer_items);
         // nav drawer icons from resources
@@ -145,7 +147,6 @@ public class TelegraphActivity extends AbstractActivity {
     private View initializeNavigationDrawerHeader(){
         LayoutInflater inflater = getLayoutInflater();
         View listHeaderView = inflater.inflate(R.layout.nav_drawer_header, null, false);
-
         TextView nameTextView = (TextView) listHeaderView.findViewById(R.id.nameTextView);
         TextView emailTextView = (TextView) listHeaderView.findViewById(R.id.emailTextView);
         nameTextView.setText(ParserMail.parseName(mailBox.getEmail()));
@@ -215,6 +216,18 @@ public class TelegraphActivity extends AbstractActivity {
             Toast.makeText(TelegraphActivity.this, "Add to database "
                     + String.valueOf(endtime - startTime), Toast.LENGTH_LONG).show();
             progressView.setVisibility(View.INVISIBLE);
+
+            tabs.setDistributeEvenly(true);
+            viewPagerAdapter = new MailViewPagerAdapter(getSupportFragmentManager(),
+                    databaseHelper.getReadableDatabase());
+            viewPager.setAdapter(viewPagerAdapter);
+            tabs.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
+                @Override
+                public int getIndicatorColor(int position) {
+                    return getResources().getColor(R.color.colorPrimary);
+                }
+            });
+            tabs.setViewPager(viewPager);
         }
     }
 }
