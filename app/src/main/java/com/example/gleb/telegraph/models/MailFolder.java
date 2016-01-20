@@ -87,4 +87,22 @@ public class MailFolder {
         else
             return 0;
     }
+
+    /**
+     * Get last index of folder in database
+     * @param SQLiteDatabase        Database
+     * @return int                  Code of folder in database
+     * */
+    public static List<String> selectFolders(SQLiteDatabase sdb){
+        List<String> folders = new ArrayList<>();
+        Cursor cursor = sdb.query(DatabaseHelper.TABLE_FOLDERS,
+                new String[]{DatabaseHelper.NAME_FOLDER}, null, null, null, null, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                folders.add(cursor.getString(0));
+            }
+            while(cursor.moveToNext());
+        }
+        return folders;
+    }
 }
