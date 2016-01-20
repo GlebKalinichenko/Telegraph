@@ -154,6 +154,25 @@ public class TelegraphActivity extends AbstractActivity {
         return listHeaderView;
     }
 
+    /**
+     * Initialize view pager for slide between fragments
+     * @param void
+     * @return void
+     * */
+    private void initializeViewPager(){
+        tabs.setDistributeEvenly(true);
+        viewPagerAdapter = new MailViewPagerAdapter(getSupportFragmentManager(),
+                databaseHelper.getReadableDatabase());
+        viewPager.setAdapter(viewPagerAdapter);
+        tabs.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
+            @Override
+            public int getIndicatorColor(int position) {
+                return getResources().getColor(R.color.colorPrimary);
+            }
+        });
+        tabs.setViewPager(viewPager);
+    }
+
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -216,18 +235,7 @@ public class TelegraphActivity extends AbstractActivity {
             Toast.makeText(TelegraphActivity.this, "Add to database "
                     + String.valueOf(endtime - startTime), Toast.LENGTH_LONG).show();
             progressView.setVisibility(View.INVISIBLE);
-
-            tabs.setDistributeEvenly(true);
-            viewPagerAdapter = new MailViewPagerAdapter(getSupportFragmentManager(),
-                    databaseHelper.getReadableDatabase());
-            viewPager.setAdapter(viewPagerAdapter);
-            tabs.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
-                @Override
-                public int getIndicatorColor(int position) {
-                    return getResources().getColor(R.color.colorPrimary);
-                }
-            });
-            tabs.setViewPager(viewPager);
+            initializeViewPager();
         }
     }
 }
