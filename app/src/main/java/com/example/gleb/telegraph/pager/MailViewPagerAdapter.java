@@ -5,7 +5,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.example.gleb.telegraph.MailFragment;
+import com.example.gleb.telegraph.fragments.MailFragment;
 import com.example.gleb.telegraph.models.MailFolder;
 
 import java.util.List;
@@ -30,7 +30,7 @@ public class MailViewPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        Fragment mailFragment = new MailFragment();
+        MailFragment mailFragment = new MailFragment();
         return mailFragment;
     }
 
