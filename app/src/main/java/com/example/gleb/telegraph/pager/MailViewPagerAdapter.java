@@ -17,10 +17,9 @@ public class MailViewPagerAdapter extends FragmentStatePagerAdapter {
     private SQLiteDatabase sdb;
     private List<String> folders;
 
-    public MailViewPagerAdapter(FragmentManager fm, SQLiteDatabase sdb) {
+    public MailViewPagerAdapter(FragmentManager fm, List<String> folders) {
         super(fm);
-        this.sdb = sdb;
-        this.folders = MailFolder.selectFolders(sdb);
+        this.folders = folders;
     }
 
     @Override
