@@ -9,6 +9,8 @@ import android.widget.ListView;
 import com.example.gleb.telegraph.DatabaseHelper;
 import com.example.gleb.telegraph.navigationdrawer.NavDrawerAdapter;
 
+import javax.mail.internet.AddressException;
+
 /**
  * Created by Gleb on 03.01.2016.
  */
@@ -20,5 +22,5 @@ public abstract class AbstractActivity extends AppCompatActivity {
     protected String[] navMenuTitles;
     protected TypedArray navMenuIcons;
     protected NavDrawerAdapter navDrawerAdapter;
-    protected abstract void initializeWidgets();
+    protected abstract void initializeWidgets() throws AddressException;
 }
