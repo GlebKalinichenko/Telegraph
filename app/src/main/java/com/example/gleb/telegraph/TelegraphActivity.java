@@ -12,10 +12,12 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.gleb.telegraph.abstracts.AbstractActivity;
 import com.example.gleb.telegraph.connection.FactoryConnection;
+import com.example.gleb.telegraph.models.Mail;
 import com.example.gleb.telegraph.models.MailBox;
 import com.example.gleb.telegraph.models.MailSettings;
 import com.example.gleb.telegraph.navigationdrawer.NavDrawerAdapter;
@@ -25,10 +27,15 @@ import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.List;
 
+import javax.mail.Address;
 import javax.mail.Folder;
+import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Store;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.MimeUtility;
 
 /**
  * Created by Gleb on 03.01.2016.
@@ -48,7 +55,11 @@ public class TelegraphActivity extends AbstractActivity {
         setContentView(R.layout.activity_telegraph);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        initializeWidgets();
+        try {
+            initializeWidgets();
+        } catch (AddressException e) {
+            e.printStackTrace();
+        }
 
         progressView.setVisibility(View.VISIBLE);
         progressView.startAnimation();
@@ -69,7 +80,7 @@ public class TelegraphActivity extends AbstractActivity {
      * @return void
      * */
     @Override
-    protected void initializeWidgets() {
+    protected void initializeWidgets() throws AddressException {
         mailBox = (MailBox) getIntent().getSerializableExtra(TelegraphActivity.MAIL_BOX);
         mailSettings = (MailSettings) getIntent().getSerializableExtra(TelegraphActivity.MAIL_SETTINGS);
         progressView = (CircularProgressView) findViewById(R.id.progress_view);
@@ -91,7 +102,7 @@ public class TelegraphActivity extends AbstractActivity {
      * @param void
      * @return void
      * */
-    private void initializeNavigationDrawer(){
+    private void initializeNavigationDrawer() throws AddressException {
         ArrayList<NavDrawerItem> navDrawerItems = new ArrayList<NavDrawerItem>();
         navDrawerItems.add(new NavDrawerItem(navMenuTitles[0], navMenuIcons.getResourceId(0, -1)));
         navDrawerItems.add(new NavDrawerItem(navMenuTitles[1], navMenuIcons.getResourceId(1, -1)));
@@ -108,9 +119,15 @@ public class TelegraphActivity extends AbstractActivity {
         navMenuIcons.recycle();
         LayoutInflater inflater = getLayoutInflater();
         View listHeaderView = inflater.inflate(R.layout.nav_drawer_header, null, false);
+
+        TextView nameTextView = (TextView) listHeaderView.findViewById(R.id.nameTextView);
+        TextView emailTextView = (TextView) listHeaderView.findViewById(R.id.emailTextView);
+        nameTextView.setText(ParserMail.parseName(mailBox.getEmail()));
+        emailTextView.setText(mailBox.getEmail());
+
         navDrawerListView.addHeaderView(listHeaderView);
-        NavDrawerAdapter adapter = new NavDrawerAdapter(getApplicationContext(), navDrawerItems);
-        navDrawerListView.setAdapter(adapter);
+        navDrawerAdapter = new NavDrawerAdapter(getApplicationContext(), navDrawerItems);
+        navDrawerListView.setAdapter(navDrawerAdapter);
 
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.app_name,
                 R.string.app_name){
