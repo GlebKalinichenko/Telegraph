@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.example.gleb.telegraph.abstracts.AbstractActivity;
 import com.example.gleb.telegraph.connection.FactoryConnection;
 import com.example.gleb.telegraph.models.MailBox;
+import com.example.gleb.telegraph.models.MailFolder;
 import com.example.gleb.telegraph.models.MailSettings;
 import com.example.gleb.telegraph.navigationdrawer.NavDrawerAdapter;
 import com.example.gleb.telegraph.navigationdrawer.NavDrawerItem;
@@ -28,6 +29,7 @@ import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.mail.Folder;
 import javax.mail.MessagingException;
@@ -159,9 +161,8 @@ public class TelegraphActivity extends AbstractActivity {
      * @param void
      * @return void
      * */
-    private void initializeViewPager(){
-        viewPagerAdapter = new MailViewPagerAdapter(getSupportFragmentManager(),
-                databaseHelper.getReadableDatabase());
+    private void initializeViewPager(List<String> folders){
+        viewPagerAdapter = new MailViewPagerAdapter(getSupportFragmentManager(), folders);
         viewPager.setAdapter(viewPagerAdapter);
         tabs.setDistributeEvenly(true);
         tabs.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
@@ -190,6 +191,7 @@ public class TelegraphActivity extends AbstractActivity {
         private MailBox mailBox;
         private MailSettings mailSettings;
         private Store store;
+        private Folder[] folders;
 
         public Loader(MailBox mailBox, MailSettings mailSettings) {
             this.mailSettings = mailSettings;
@@ -214,7 +216,7 @@ public class TelegraphActivity extends AbstractActivity {
             }
             try {
                 if (store != null) {
-                    Folder[] folders = store.getDefaultFolder().list();
+                    folders = store.getDefaultFolder().list();
                     ParserMail parserMail = new ParserMail(mailBox.getEmail(), databaseHelper);
                     parserMail.parseFolder(folders);
                 }
@@ -235,7 +237,7 @@ public class TelegraphActivity extends AbstractActivity {
             Toast.makeText(TelegraphActivity.this, "Add to database "
                     + String.valueOf(endtime - startTime), Toast.LENGTH_LONG).show();
             progressView.setVisibility(View.INVISIBLE);
-            initializeViewPager();
+            initializeViewPager(MailFolder.folderToString(folders));
         }
     }
 }
