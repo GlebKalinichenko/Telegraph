@@ -117,14 +117,7 @@ public class TelegraphActivity extends AbstractActivity {
         navDrawerItems.add(new NavDrawerItem(navMenuTitles[10], navMenuIcons.getResourceId(10, -1)));
 
         navMenuIcons.recycle();
-        LayoutInflater inflater = getLayoutInflater();
-        View listHeaderView = inflater.inflate(R.layout.nav_drawer_header, null, false);
-
-        TextView nameTextView = (TextView) listHeaderView.findViewById(R.id.nameTextView);
-        TextView emailTextView = (TextView) listHeaderView.findViewById(R.id.emailTextView);
-        nameTextView.setText(ParserMail.parseName(mailBox.getEmail()));
-        emailTextView.setText(mailBox.getEmail());
-
+        View listHeaderView = initializeNavigationDrawerHeader();
         navDrawerListView.addHeaderView(listHeaderView);
         navDrawerAdapter = new NavDrawerAdapter(getApplicationContext(), navDrawerItems);
         navDrawerListView.setAdapter(navDrawerAdapter);
@@ -142,6 +135,22 @@ public class TelegraphActivity extends AbstractActivity {
 
         drawerToggle.setDrawerIndicatorEnabled(true);
         drawerLayout.setDrawerListener(drawerToggle);
+    }
+
+    /**
+     * Initialize header of navigation drawer
+     * @param void
+     * @return View        Header of navigation drawer
+     * */
+    private View initializeNavigationDrawerHeader(){
+        LayoutInflater inflater = getLayoutInflater();
+        View listHeaderView = inflater.inflate(R.layout.nav_drawer_header, null, false);
+
+        TextView nameTextView = (TextView) listHeaderView.findViewById(R.id.nameTextView);
+        TextView emailTextView = (TextView) listHeaderView.findViewById(R.id.emailTextView);
+        nameTextView.setText(ParserMail.parseName(mailBox.getEmail()));
+        emailTextView.setText(mailBox.getEmail());
+        return listHeaderView;
     }
 
     @Override
