@@ -25,6 +25,7 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Part;
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeUtility;
 import javax.mail.search.FlagTerm;
@@ -168,12 +169,7 @@ public class ParserMail {
         String email = "";
         Address[] in = message.getFrom();
         for (Address address : in) {
-            String decodeAddress = MimeUtility.decodeText(address.toString());
-            if (decodeAddress.indexOf("<") == -1 && decodeAddress.indexOf(">") == -1)
-                email = decodeAddress;
-            else
-                //add email of sender of mail
-                email = decodeAddress.substring(decodeAddress.indexOf("<") + 1, decodeAddress.indexOf(">"));
+            email = ((InternetAddress) address).getAddress();
         }
         return email;
     }
@@ -187,12 +183,7 @@ public class ParserMail {
         String name = "";
         Address[] in = message.getFrom();
         for (Address address : in) {
-            String decodeAddress = MimeUtility.decodeText(address.toString());
-            if (decodeAddress.indexOf("<") == -1 && decodeAddress.indexOf(">") == -1)
-                name = decodeAddress;
-            else
-                //add name of sender of mail
-                name = decodeAddress.substring(0, decodeAddress.indexOf("<"));
+            name = ((InternetAddress) address).getPersonal();
         }
         return name;
     }
@@ -282,5 +273,15 @@ public class ParserMail {
             }
         }
         return attachs;
+    }
+
+    /**
+     * Get name of sender
+     * @param Message        Message with name of sender
+     * @return String        Name of sender
+     * */
+    public static String parseName(String email) {
+        String name = email.substring(0, email.indexOf("@"));
+        return name;
     }
 }
