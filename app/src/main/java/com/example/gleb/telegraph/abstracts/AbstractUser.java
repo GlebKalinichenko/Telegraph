@@ -3,7 +3,7 @@ package com.example.gleb.telegraph.abstracts;
 /**
  * Created by Gleb on 30.12.2015.
  */
-public class AbstractUser {
+public abstract class AbstractUser {
     protected String email;
 
     public AbstractUser(String email) {
