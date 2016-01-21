@@ -3,7 +3,7 @@ package com.example.gleb.telegraph.abstracts;
 /**
  * Created by Gleb on 30.12.2015.
  */
-public class AbstractDatabaseCryptography {
+public abstract class AbstractDatabaseCryptography {
     protected String linkToFolder;
 
     public AbstractDatabaseCryptography(String linkToFolder) {
