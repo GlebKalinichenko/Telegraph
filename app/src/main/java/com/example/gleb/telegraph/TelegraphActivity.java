@@ -162,13 +162,14 @@ public class TelegraphActivity extends AbstractActivity {
      * @return void
      * */
     private void initializeViewPager(List<String> folders){
-        viewPagerAdapter = new MailViewPagerAdapter(getSupportFragmentManager(), folders);
+        viewPagerAdapter = new MailViewPagerAdapter(getSupportFragmentManager(), folders,
+                databaseHelper.getReadableDatabase());
         viewPager.setAdapter(viewPagerAdapter);
         tabs.setDistributeEvenly(true);
         tabs.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
             @Override
             public int getIndicatorColor(int position) {
-                return getResources().getColor(R.color.colorAccent);
+                return getResources().getColor(R.color.colorPrimary);
             }
         });
         tabs.setViewPager(viewPager);
