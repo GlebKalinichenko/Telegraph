@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="82dp"
+    android:padding="@dimen/activity_horizontal_margin"
+    android:background="?android:selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:orientation="vertical" >
+
+    <View
+        android:id="@+id/icon_circle"
+        android:transitionName="@string/transition_name_circle"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@drawable/circle"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/icon_circle"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:orientation="vertical"
+        android:id="@+id/linearLayout">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/subjectTextView"
+                android:transitionName="@string/transition_name_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Jonh Doe"
+                android:textColor="#000"
+                android:textSize="18sp"
+                android:singleLine="true"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="10:00"
+                android:id="@+id/dateTextView"
+                android:layout_alignTop="@+id/icon_circle"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="LinkedIn,"
+                android:id="@+id/senderTextView"
+                android:textColor="#000"
+                android:textSize="15sp"
+                android:singleLine="true"/>
+
+            <TextView
+                android:id="@+id/contentTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="+01 123456789"
+                android:transitionName="@string/transition_name_phone"
+                android:textColor="#9f9f9f"
+                android:textSize="15sp"
+                android:layout_marginLeft="10dp"
+                android:singleLine="true"
+                android:layout_weight="1"/>
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/imageButton"
+                android:background="@drawable/star"
+                android:layout_below="@+id/dateTextView"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>
