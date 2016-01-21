@@ -1,5 +1,8 @@
 package com.example.gleb.telegraph;
 
+import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,9 +19,11 @@ import java.util.List;
 public class MailAdapter extends RecyclerView.Adapter<MailAdapter.MailViewHolder> {
     public static final String TAG = "Tag";
     private List<Mail> mails;
+    private Context context;
 
-    public MailAdapter(List<Mail> mails){
+    public MailAdapter(List<Mail> mails, Context context){
         this.mails = mails;
+        this.context = context;
     }
 
     public static class MailViewHolder extends RecyclerView.ViewHolder {
@@ -26,13 +31,15 @@ public class MailAdapter extends RecyclerView.Adapter<MailAdapter.MailViewHolder
         TextView contentTextView;
         TextView senderTextView;
         TextView dateTextView;
+        View circle;
 
-        MailViewHolder(View itemView) {
+        MailViewHolder(View itemView, Context context) {
             super(itemView);
             subjectTextView = (TextView)itemView.findViewById(R.id.subjectTextView);
             contentTextView = (TextView)itemView.findViewById(R.id.contentTextView);
             senderTextView = (TextView)itemView.findViewById(R.id.senderTextView);
             dateTextView = (TextView)itemView.findViewById(R.id.dateTextView);
+            circle = (View)itemView.findViewById(R.id.icon_circle);
         }
     }
 
@@ -44,7 +51,7 @@ public class MailAdapter extends RecyclerView.Adapter<MailAdapter.MailViewHolder
     @Override
     public MailViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_mail_adapter, viewGroup, false);
-        MailViewHolder pvh = new MailViewHolder(v);
+        MailViewHolder pvh = new MailViewHolder(v, context);
         return pvh;
     }
 
@@ -54,6 +61,10 @@ public class MailAdapter extends RecyclerView.Adapter<MailAdapter.MailViewHolder
         personViewHolder.contentTextView.setText(mails.get(i).getContent());
         personViewHolder.senderTextView.setText(mails.get(i).getNameSender() + ",");
         personViewHolder.dateTextView.setText(mails.get(i).getDate().substring(0, 5));
+        GradientDrawable bgShape = (GradientDrawable) personViewHolder.circle.getBackground();
+        //colors for first symbol of email sender
+        String[] allColors = context.getResources().getStringArray(R.array.colors);
+        bgShape.setColor(Color.parseColor(allColors[i % 4]));
     }
 
     @Override
