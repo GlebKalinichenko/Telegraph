@@ -17,9 +17,10 @@ public class MailViewPagerAdapter extends FragmentStatePagerAdapter {
     private SQLiteDatabase sdb;
     private List<String> folders;
 
-    public MailViewPagerAdapter(FragmentManager fm, List<String> folders) {
+    public MailViewPagerAdapter(FragmentManager fm, List<String> folders, SQLiteDatabase sdb) {
         super(fm);
         this.folders = folders;
+        this.sdb = sdb;
     }
 
     @Override
@@ -29,7 +30,7 @@ public class MailViewPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        MailFragment mailFragment = new MailFragment();
+        MailFragment mailFragment = new MailFragment(folders.get(position), sdb);
         return mailFragment;
     }
 
