@@ -55,8 +55,8 @@ public class Mail {
             stmt.bindString(3, mails.get(i).getReceiver());
             stmt.bindString(4, mails.get(i).getSubject());
             stmt.bindString(5, mails.get(i).getContent());
-            stmt.bindString(6, mails.get(i).getDate());
-            stmt.bindLong(7, foldersCode.get(i));
+            stmt.bindLong(6, foldersCode.get(i));
+            stmt.bindString(7, mails.get(i).getDate());
             stmt.bindLong(8, mails.get(i).isHasAttach());
             stmt.bindLong(9, straightIndex);
             long entryID = stmt.executeInsert();
@@ -101,6 +101,40 @@ public class Mail {
                 Mail mail = new Mail(sender, namesender, receiver, subject, content, date,
                         hasAttach);
                 mails.add(mail);
+            }
+            while (cursor.moveToNext());
+        }
+        return mails;
+    }
+
+    /**
+     * Select all mails by condition of name of folder
+     * @param SQLiteDatabase        Database
+     * @param String                Folder for condition select
+     * @return List<Mail>           List of mails
+     * */
+    public static List<Mail> selectMailsByFolder(SQLiteDatabase sdb, String folder){
+        List<Mail> mails = new ArrayList<>();
+        String query = "Select Users.Email, Mails.NameSender, Mails.Receiver, Mails.Subject," +
+                " Mails.Content, Mails.Date, Mails.HasAttach, Mails.StraightIndex " +
+                "from Mails inner join Folders on Mails.FolderCode = Folders.IdFolder " +
+                "inner join Users on Mails.SenderUserCode = Users.IdUser " +
+                "and Folders.NameFolder = '" + folder + "'";
+        Cursor cursor = sdb.rawQuery(query, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                if (cursor.getInt(7) == 1) {
+                    String sender = cursor.getString(0);
+                    String namesender = cursor.getString(1);
+                    String receiver = cursor.getString(2);
+                    String subject = cursor.getString(3);
+                    String content = cursor.getString(4);
+                    String date = cursor.getString(5);
+                    int hasAttach = cursor.getInt(6);
+                    Mail mail = new Mail(sender, namesender, receiver, subject, content, date,
+                            hasAttach);
+                    mails.add(mail);
+                }
             }
             while (cursor.moveToNext());
         }
