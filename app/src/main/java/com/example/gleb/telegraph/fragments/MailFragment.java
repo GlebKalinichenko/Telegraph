@@ -38,7 +38,7 @@ public class MailFragment extends AbstractFragment {
         recyclerView.setHasFixedSize(true);
 
         //initialize adapter with list of mails
-        mailAdapter = new MailAdapter(Mail.selectMailsByFolder(sdb, folder));
+        mailAdapter = new MailAdapter(Mail.selectMailsByFolder(sdb, folder), getContext());
         recyclerView.setAdapter(mailAdapter);
         return v;
     }
