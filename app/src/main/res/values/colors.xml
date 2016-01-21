@@ -6,4 +6,10 @@
     <color name="colorAccent">#FF4081</color>
     <color name="colorGrayEffect">#ff3b3b3b</color>
     <color name="white">#ffffffff</color>
+    <string-array name="colors">
+        <item>#33b5e5</item>
+        <item>#ffbb33</item>
+        <item>#ff4444</item>
+        <item>#99cc00</item>
+    </string-array>
 </resources>
