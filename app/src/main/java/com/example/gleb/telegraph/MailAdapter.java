@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.gleb.telegraph.models.Mail;
@@ -32,6 +33,8 @@ public class MailAdapter extends RecyclerView.Adapter<MailAdapter.MailViewHolder
         TextView senderTextView;
         TextView dateTextView;
         View circle;
+        ImageView attachImageView;
+        TextView symbolTextView;
 
         MailViewHolder(View itemView, Context context) {
             super(itemView);
@@ -40,6 +43,8 @@ public class MailAdapter extends RecyclerView.Adapter<MailAdapter.MailViewHolder
             senderTextView = (TextView)itemView.findViewById(R.id.senderTextView);
             dateTextView = (TextView)itemView.findViewById(R.id.dateTextView);
             circle = (View)itemView.findViewById(R.id.icon_circle);
+            attachImageView = (ImageView)itemView.findViewById(R.id.attachImageView);
+            symbolTextView = (TextView)itemView.findViewById(R.id.symbolTextView);
         }
     }
 
@@ -65,6 +70,10 @@ public class MailAdapter extends RecyclerView.Adapter<MailAdapter.MailViewHolder
         //colors for first symbol of email sender
         String[] allColors = context.getResources().getStringArray(R.array.colors);
         bgShape.setColor(Color.parseColor(allColors[i % 4]));
+        personViewHolder.symbolTextView.setText(mails.get(i).getNameSender().substring(0, 1));
+        //icon attach on mails with attach
+        if (mails.get(i).isHasAttach() == 1)
+            personViewHolder.attachImageView.setVisibility(View.VISIBLE);
     }
 
     @Override
