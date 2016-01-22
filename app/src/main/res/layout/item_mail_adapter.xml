@@ -42,6 +42,14 @@
                 android:singleLine="true"
                 android:layout_weight="1"/>
 
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/attachImageView"
+                android:src="@drawable/attachment"
+                android:visibility="invisible"
+                android:layout_marginRight="5dp"/>
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -91,5 +99,19 @@
         </LinearLayout>
 
     </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:layout_width="40dp"
+            android:layout_height="20dp"
+            android:text="A"
+            android:id="@+id/symbolTextView"
+            android:textColor="@color/white"
+            android:layout_gravity="left|center_vertical"
+            android:gravity="center_horizontal"/>
+    </FrameLayout>
 
 </RelativeLayout>
