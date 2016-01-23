@@ -31,7 +31,7 @@
 
     <style name="attachTextView">
         <item name="android:textColor">@color/colorPrimary</item>
-        <item name="layout_gravity">center_vertical</item>
+        <item name="android:layout_gravity">center_vertical</item>
         <item name="android:padding">15dp</item>
     </style>
 
