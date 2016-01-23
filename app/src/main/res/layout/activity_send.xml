@@ -56,21 +56,30 @@
             android:layout_alignBottom="@+id/attachTextView"
             android:layout_centerHorizontal="true" />
 
-        <Button
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/chooseAttachButton"
+            android:textSize="12dp"
+            android:drawableRight="@drawable/arrow_unpressed"
+            android:background="@drawable/background_arrow"
+            android:paddingRight="15dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Choose attachment"
-            android:id="@+id/chooseAttachButton"
-            android:layout_alignParentTop="true"
-            android:textSize="12dp"
+            android:id="@+id/attachArrowTextView"
             android:textColor="@color/colorPrimary"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:drawableRight="@drawable/arrow"
-            android:background="@android:color/transparent"
-            android:layout_alignLeft="@+id/horizontalView"
-            android:layout_alignStart="@+id/horizontalView"
-            android:paddingRight="15dp"/>
+            android:layout_gravity="center_vertical"
+            android:padding="15dp"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/horizontalView"
+            android:layout_toEndOf="@+id/horizontalView" />
+
     </RelativeLayout>
 
     <View
@@ -182,6 +191,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/messageEditText"
             android:layout_gravity="left|center_vertical"
+            android:hint="Text of message"
             android:layout_alignParentTop="true"
             android:layout_toLeftOf="@+id/imageView6"
             android:layout_toRightOf="@+id/imageView7"
