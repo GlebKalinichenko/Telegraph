@@ -44,8 +44,8 @@ public class User extends AbstractUser {
      * @return int                  Id of email sender or 0 if email is empty
      * */
     public static long checkUserEmail(SQLiteDatabase sdb, String emailSender){
-        Cursor cursor = sdb.query(DatabaseHelper.TABLE_USERS, new String[]{DatabaseHelper.ID_USER, DatabaseHelper.EMAIL_USER},
-                DatabaseHelper.EMAIL_USER + "=?", new String[]{emailSender}, null, null, null, null);
+        String query = "Select Users.IdUser from Users where Email='" + emailSender + "'";
+        Cursor cursor = sdb.rawQuery(query, null);
         if (cursor != null && cursor.moveToFirst()) {
             sdb.close();
             return cursor.getLong(0);
