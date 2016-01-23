@@ -45,9 +45,7 @@
             android:layout_height="wrap_content"
             android:text="Attachment"
             android:id="@+id/attachTextView"
-            android:textColor="@color/colorPrimary"
-            android:layout_gravity="center_vertical"
-            android:padding="15dp"/>
+            style="@style/attachTextView"/>
 
         <View
             android:id="@+id/horizontalView"
@@ -73,9 +71,7 @@
             android:layout_height="wrap_content"
             android:text="Choose attachment"
             android:id="@+id/attachArrowTextView"
-            android:textColor="@color/colorPrimary"
-            android:layout_gravity="center_vertical"
-            android:padding="15dp"
+            style="@style/attachTextView"
             android:layout_alignParentTop="true"
             android:layout_toRightOf="@+id/horizontalView"
             android:layout_toEndOf="@+id/horizontalView" />
