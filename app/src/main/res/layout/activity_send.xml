@@ -173,7 +173,7 @@
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/cameraImageView"
+            android:id="@+id/cameraImageButton"
             android:background="@drawable/background_camera"
             android:paddingRight="15dp"
             android:layout_gravity="right|center_vertical"
@@ -196,7 +196,7 @@
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/sendImageView"
+            android:id="@+id/sendImageButton"
             android:background="@drawable/background_send"
             android:paddingRight="15dp"
             android:layout_gravity="right|center_vertical"
