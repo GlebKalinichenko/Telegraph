@@ -109,7 +109,7 @@
             android:layout_height="20dp"
             android:text="A"
             android:id="@+id/symbolTextView"
-            android:textColor="@color/white"
+            android:textColor="@color/colorWhite"
             android:layout_gravity="left|center_vertical"
             android:gravity="center_horizontal"/>
     </FrameLayout>
