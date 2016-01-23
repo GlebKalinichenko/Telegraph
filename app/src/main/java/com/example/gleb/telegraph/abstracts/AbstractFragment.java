@@ -6,10 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.gleb.telegraph.DatabaseHelper;
-import com.example.gleb.telegraph.MailAdapter;
-
-import javax.mail.internet.AddressException;
+import com.example.gleb.telegraph.recyclerviews.MailAdapter;
 
 /**
  * Created by gleb on 20.01.16.
