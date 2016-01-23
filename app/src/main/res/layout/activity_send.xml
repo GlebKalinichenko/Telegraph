@@ -54,27 +54,26 @@
             android:layout_alignBottom="@+id/attachTextView"
             android:layout_centerHorizontal="true" />
 
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/chooseAttachButton"
-            android:textSize="12dp"
-            android:drawableRight="@drawable/arrow_unpressed"
-            android:background="@drawable/background_arrow"
-            android:paddingRight="15dp"
-            android:layout_centerVertical="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true" />
-
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Choose attachment"
+            android:text="Choose file"
             android:id="@+id/attachArrowTextView"
             style="@style/attachTextView"
             android:layout_alignParentTop="true"
             android:layout_toRightOf="@+id/horizontalView"
             android:layout_toEndOf="@+id/horizontalView" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/chooseAttachButton"
+            android:textSize="12dp"
+            android:background="@drawable/background_arrow"
+            android:paddingRight="15dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
 
     </RelativeLayout>
 
