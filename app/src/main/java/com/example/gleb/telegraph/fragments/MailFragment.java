@@ -9,13 +9,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.gleb.telegraph.DatabaseHelper;
-import com.example.gleb.telegraph.MailAdapter;
+import com.example.gleb.telegraph.recyclerviews.MailAdapter;
 import com.example.gleb.telegraph.R;
 import com.example.gleb.telegraph.abstracts.AbstractFragment;
 import com.example.gleb.telegraph.models.Mail;
-
-import java.util.List;
 
 /**
  * Created by gleb on 20.01.16.
