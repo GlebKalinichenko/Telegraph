@@ -29,4 +29,10 @@
         <item name="android:layout_height">wrap_content</item>
     </style>
 
+    <style name="attachTextView">
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="layout_gravity">center_vertical</item>
+        <item name="android:padding">15dp</item>
+    </style>
+
 </resources>
