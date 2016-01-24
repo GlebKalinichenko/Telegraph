@@ -36,6 +36,7 @@ import java.util.List;
 
 import javax.mail.Folder;
 import javax.mail.MessagingException;
+import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.internet.AddressException;
 
@@ -194,6 +195,7 @@ public class TelegraphActivity extends AbstractActivity {
     public class Loader extends AsyncTask<Void, Void, Void> {
         private MailBox mailBox;
         private MailSettings mailSettings;
+        private Session session;
         private Store store;
         private Folder[] folders;
 
@@ -208,7 +210,8 @@ public class TelegraphActivity extends AbstractActivity {
             final Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    store = factoryConnection.getStore(mailSettings, mailBox);
+                    session = factoryConnection.getSession(mailSettings, mailBox.getReceiveProtocol());
+                    store = factoryConnection.authentication(session, mailSettings, mailBox);
                 }
 
             });
