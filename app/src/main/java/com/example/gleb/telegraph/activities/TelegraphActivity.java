@@ -74,6 +74,8 @@ public class TelegraphActivity extends AbstractActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(TelegraphActivity.this, SendMailActivity.class);
+                intent.putExtra(SendMailActivity.MAIL_BOX, mailBox);
+                intent.putExtra(SendMailActivity.MAIL_SETTINGS, mailSettings);
                 startActivity(intent);
             }
         });
