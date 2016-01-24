@@ -5,6 +5,7 @@ import com.example.gleb.telegraph.models.MailSettings;
 
 import java.util.Properties;
 
+import javax.mail.Session;
 import javax.mail.Store;
 
 /**
@@ -12,5 +13,5 @@ import javax.mail.Store;
  */
 abstract public class AbstractConnection {
     public Properties props;
-    public abstract Store authentication(MailSettings mailSettings, MailBox mailBox);
+    public abstract Session settingProperties(MailSettings mailSettings);
 }
