@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.gleb.telegraph.DatabaseHelper;
+import com.example.gleb.telegraph.connection.Protocols;
 import com.example.gleb.telegraph.R;
 import com.example.gleb.telegraph.abstracts.AbstractActivity;
 import com.example.gleb.telegraph.connection.FactoryConnection;
@@ -28,6 +29,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import javax.mail.Session;
 import javax.mail.Store;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -59,7 +61,7 @@ public class SignInActivity extends AbstractActivity {
                     progressView.setVisibility(View.VISIBLE);
                     progressView.startAnimation();
                     MailBox mailBox = new MailBox(emailEditText.getText().toString(),
-                            passwordEditText.getText().toString(), "imap");
+                            passwordEditText.getText().toString(), Protocols.IMAP, Protocols.SMTP);
                     String namePost = MailBox.parseEmail(emailEditText.getText().toString());
                     new LoaderAuthentication(namePost, mailBox).execute();
                 }
@@ -69,9 +71,10 @@ public class SignInActivity extends AbstractActivity {
 
     /**
      * Handle of change wifi connection
-     * @param NetworkStateChanged        Event for check state wifi connection
+     *
+     * @param NetworkStateChanged Event for check state wifi connection
      * @return void
-     * */
+     */
     public void onEvent(NetworkStateChanged event) {
         if (!event.isInternetConnected()) {
             Toast.makeText(SignInActivity.this, getResources().getString(R.string.wifi_disconnected),
@@ -115,6 +118,7 @@ public class SignInActivity extends AbstractActivity {
         private MailSettings mailSettings;
         private MailBox mailBox;
         private boolean isAuthentication;
+        private Session session;
         private Store store;
 
         public LoaderAuthentication(String urlServer, MailBox mailBox) {
@@ -147,7 +151,8 @@ public class SignInActivity extends AbstractActivity {
             final Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    store = factoryConnection.getStore(mailSettings, mailBox);
+                    session = factoryConnection.getSession(mailSettings, mailBox.getReceiveProtocol());
+                    store = factoryConnection.authentication(session, mailSettings, mailBox);
                 }
 
             });
@@ -157,7 +162,7 @@ public class SignInActivity extends AbstractActivity {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            if (store != null){
+            if (session != null) {
                 isAuthentication = true;
                 SQLiteDatabase sdb = databaseHelper.getWritableDatabase();
                 //add information about account to database
@@ -168,8 +173,7 @@ public class SignInActivity extends AbstractActivity {
                 mailSettings.addSettings(sdb, MailBox.getLastAccount(db));
                 db.close();
                 sdb.close();
-            }
-            else
+            } else
                 isAuthentication = false;
 
             return isAuthentication;
@@ -177,9 +181,9 @@ public class SignInActivity extends AbstractActivity {
 
         @Override
         protected void onPostExecute(Boolean params) {
-            if (!params){
+            if (!params) {
                 Toast.makeText(getApplicationContext(), "No athentification", Toast.LENGTH_LONG).show();
-            } else{
+            } else {
                 Intent intent = new Intent(SignInActivity.this, TelegraphActivity.class);
                 intent.putExtra(TelegraphActivity.MAIL_BOX, mailBox);
                 intent.putExtra(TelegraphActivity.MAIL_SETTINGS, mailSettings);
