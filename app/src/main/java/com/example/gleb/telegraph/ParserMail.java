@@ -85,7 +85,7 @@ public class ParserMail {
      * @param Message[]        Array of message from post server
      * @return void
      * */
-    private void parsePostMessage(Message[] messages, int folderCode) throws MessagingException, IOException {
+    private synchronized void parsePostMessage(Message[] messages, int folderCode) throws MessagingException, IOException {
         List<Mail> mails = new ArrayList<>();
         List<Long> usersCode = new ArrayList<>();
         List<Integer> foldersCode = new ArrayList<>();
