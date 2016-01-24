@@ -14,13 +14,14 @@ import java.io.Serializable;
 public class MailBox implements Serializable {
     private String email;
     private String password;
-    private String useProtocol;
+    private String receiveProtocol;
+    private String sendProtocol;
 
-
-    public MailBox(String email, String password, String useProtocol) {
+    public MailBox(String email, String password, String receiveProtocol, String sendProtocol) {
         this.email = email;
         this.password = password;
-        this.useProtocol = useProtocol;
+        this.receiveProtocol = receiveProtocol;
+        this.sendProtocol = sendProtocol;
     }
 
     /**
@@ -43,7 +44,7 @@ public class MailBox implements Serializable {
         ContentValues values = new ContentValues();
         values.put(DatabaseHelper.EMAIL_ACCOUNT, this.email);
         values.put(DatabaseHelper.PASSWORD_ACCOUNT, this.password);
-        values.put(DatabaseHelper.USE_PROTOCOL, this.useProtocol);
+        values.put(DatabaseHelper.RECEIVE_PROTOCOL, this.receiveProtocol);
         sdb.insert(DatabaseHelper.TABLE_MAIL_BOXES, null, values);
     }
 
@@ -76,11 +77,19 @@ public class MailBox implements Serializable {
         this.password = password;
     }
 
-    public String getUseProtocol() {
-        return useProtocol;
+    public String getReceiveProtocol() {
+        return receiveProtocol;
     }
 
-    public void setUseProtocol(String useProtocol) {
-        this.useProtocol = useProtocol;
+    public void setReceiveProtocol(String receiveProtocol) {
+        this.receiveProtocol = receiveProtocol;
+    }
+
+    public String getSendProtocol() {
+        return sendProtocol;
+    }
+
+    public void setSendProtocol(String sendProtocol) {
+        this.sendProtocol = sendProtocol;
     }
 }
