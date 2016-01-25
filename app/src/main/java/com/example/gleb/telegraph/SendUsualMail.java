@@ -2,14 +2,13 @@ package com.example.gleb.telegraph;
 
 import android.os.AsyncTask;
 
-import com.example.gleb.telegraph.connection.FactoryConnection;
+import com.example.gleb.telegraph.properties.FactoryProperties;
 import com.example.gleb.telegraph.models.MailBox;
 import com.example.gleb.telegraph.models.MailSettings;
 
 import java.util.Date;
+import java.util.Properties;
 
-import javax.activation.CommandMap;
-import javax.activation.MailcapCommandMap;
 import javax.mail.Multipart;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
@@ -25,6 +24,17 @@ import javax.mail.internet.MimeMultipart;
 public class SendUsualMail extends javax.mail.Authenticator implements SendMailInterface {
     private MailBox mailBox;
 
+    /**
+     * Send usual mail
+     * @param String        Subject of mail
+     * @param String        Message of mail
+     * @param String[]      Array of receivers
+     * @param boolean       Is mail has encryption
+     * @param boolean       Is mail has digest
+     * @param MailSettings  Settings of mail
+     * @param MailBox       Email account
+     * @return boolean      Is mail send successfully
+     * */
     @Override
     public boolean sendMail(String subject, String message, String[] receivers, boolean hasEncryption,
         boolean hasDigest, MailSettings mailSettings, MailBox mailBox) {
@@ -37,6 +47,7 @@ public class SendUsualMail extends javax.mail.Authenticator implements SendMailI
         private MailSettings mailSettings;
         private MailBox mailBox;
         private Session session;
+        private Properties props;
         private String subject;
         private String message;
         private String[] receivers;
@@ -52,17 +63,21 @@ public class SendUsualMail extends javax.mail.Authenticator implements SendMailI
 
         @Override
         protected String doInBackground(MailSettings... params) {
-            MailcapCommandMap mc = (MailcapCommandMap) CommandMap.getDefaultCommandMap();
-            mc.addMailcap("text/html;; x-java-content-handler=com.sun.mail.handlers.text_html");
-            mc.addMailcap("text/xml;; x-java-content-handler=com.sun.mail.handlers.text_xml");
-            mc.addMailcap("text/plain;; x-java-content-handler=com.sun.mail.handlers.text_plain");
-            mc.addMailcap("multipart/*;; x-java-content-handler=com.sun.mail.handlers.multipart_mixed");
-            mc.addMailcap("message/rfc822;; x-java-content-handler=com.sun.mail.handlers.message_rfc822");
-            CommandMap.setDefaultCommandMap(mc);
-
             multipart = new MimeMultipart();
-            final FactoryConnection factoryConnection = new FactoryConnection();
-            session = factoryConnection.getSession(mailSettings, mailBox.getSendProtocol());
+            final FactoryProperties factoryProperties = new FactoryProperties();
+            final Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    props = factoryProperties.getProperties(mailSettings, mailBox.getSendProtocol());
+                    session = Session.getInstance(props, SendUsualMail.this);
+                }
+            });
+            thread.start();
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             MimeMessage msg = new MimeMessage(session);
             try {
                 msg.setFrom(new InternetAddress(mailBox.getEmail()));
