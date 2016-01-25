@@ -23,7 +23,7 @@ public class SmtpConnection extends AbstractConnection {
         props.put("mail.smtp.host", mailSettings.getAddressSmtp());
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.port", mailSettings.getPortSmtp());
-        props.put("mail.smtp.socketFactory.port", mailSettings.getPortPop3());
+        props.put("mail.smtp.socketFactory.port", mailSettings.getPortSmtp());
         props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
         props.put("mail.smtp.socketFactory.fallback", "false");
         Session session = Session.getInstance(props, null);
