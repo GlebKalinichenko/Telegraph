@@ -19,7 +19,7 @@ import com.example.gleb.telegraph.DatabaseHelper;
 import com.example.gleb.telegraph.ParserMail;
 import com.example.gleb.telegraph.R;
 import com.example.gleb.telegraph.abstracts.AbstractActivity;
-import com.example.gleb.telegraph.connection.FactoryConnection;
+import com.example.gleb.telegraph.properties.FactoryProperties;
 import com.example.gleb.telegraph.models.MailBox;
 import com.example.gleb.telegraph.models.MailFolder;
 import com.example.gleb.telegraph.models.MailSettings;
@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import javax.mail.Folder;
 import javax.mail.MessagingException;
@@ -198,6 +199,7 @@ public class TelegraphActivity extends AbstractActivity {
         private MailBox mailBox;
         private MailSettings mailSettings;
         private Session session;
+        private Properties props;
         private Store store;
         private Folder[] folders;
 
@@ -208,14 +210,14 @@ public class TelegraphActivity extends AbstractActivity {
 
         @Override
         protected Void doInBackground(Void... params) {
-            final FactoryConnection factoryConnection = new FactoryConnection();
+            final FactoryProperties factoryProperties = new FactoryProperties();
             final Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    session = factoryConnection.getSession(mailSettings, mailBox.getReceiveProtocol());
-                    store = factoryConnection.authentication(session, mailSettings, mailBox);
+                    props = factoryProperties.getProperties(mailSettings, mailBox.getReceiveProtocol());
+                    session = Session.getInstance(props, null);
+                    store = factoryProperties.authentication(session, mailSettings, mailBox);
                 }
-
             });
             thread.start();
             try {

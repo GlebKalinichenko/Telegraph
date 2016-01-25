@@ -12,10 +12,10 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.gleb.telegraph.DatabaseHelper;
-import com.example.gleb.telegraph.connection.Protocols;
+import com.example.gleb.telegraph.properties.Protocols;
 import com.example.gleb.telegraph.R;
 import com.example.gleb.telegraph.abstracts.AbstractActivity;
-import com.example.gleb.telegraph.connection.FactoryConnection;
+import com.example.gleb.telegraph.properties.FactoryProperties;
 import com.example.gleb.telegraph.models.MailBox;
 import com.example.gleb.telegraph.models.MailSettings;
 import com.example.gleb.telegraph.networkconnection.NetworkStateChanged;
@@ -28,6 +28,7 @@ import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Properties;
 
 import javax.mail.Session;
 import javax.mail.Store;
@@ -119,6 +120,7 @@ public class SignInActivity extends AbstractActivity {
         private MailBox mailBox;
         private boolean isAuthentication;
         private Session session;
+        private Properties props;
         private Store store;
 
         public LoaderAuthentication(String urlServer, MailBox mailBox) {
@@ -147,12 +149,13 @@ public class SignInActivity extends AbstractActivity {
             }
 
             mailSettings = MailSettings.newInstance(urlServer, doc);
-            final FactoryConnection factoryConnection = new FactoryConnection();
+            final FactoryProperties factoryProperties = new FactoryProperties();
             final Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    session = factoryConnection.getSession(mailSettings, mailBox.getReceiveProtocol());
-                    store = factoryConnection.authentication(session, mailSettings, mailBox);
+                    props = factoryProperties.getProperties(mailSettings, mailBox.getReceiveProtocol());
+                    session = Session.getInstance(props, null);
+                    store = factoryProperties.authentication(session, mailSettings, mailBox);
                 }
 
             });
