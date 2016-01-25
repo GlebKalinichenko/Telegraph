@@ -13,14 +13,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="To:"
-            android:id="@+id/senderEmailTextView"
+            android:id="@+id/receiversTextView"
             android:textColor="@color/colorPrimary"
             android:layout_marginLeft="15dp"/>
 
         <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/senderEmailEditText"
+            android:id="@+id/receiversEditText"
             android:layout_weight="1"/>
 
         <ImageButton
@@ -34,6 +34,28 @@
 
     <View
         android:id="@+id/verticalView"
+        style="@style/verticalView"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Subject:"
+            android:id="@+id/subjectTextView"
+            android:textColor="@color/colorPrimary"
+            android:layout_marginLeft="15dp"/>
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/subjectEditText"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
+    <View
         style="@style/verticalView"/>
 
     <RelativeLayout
