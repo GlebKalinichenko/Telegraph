@@ -14,16 +14,21 @@ import com.example.gleb.telegraph.R;
 import com.example.gleb.telegraph.abstracts.AbstractFragment;
 import com.example.gleb.telegraph.models.Mail;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by gleb on 20.01.16.
  */
 public class MailFragment extends AbstractFragment {
     private String folder;
     private SQLiteDatabase sdb;
+    private List<Mail> mails;
 
     public MailFragment(String folder, SQLiteDatabase sdb) {
         this.folder = folder;
         this.sdb = sdb;
+        this.mails = new ArrayList<>();
     }
 
     @Nullable
@@ -34,8 +39,10 @@ public class MailFragment extends AbstractFragment {
         recyclerView.setLayoutManager(llm);
         recyclerView.setHasFixedSize(true);
 
+        //select mails for folder
+        mails = Mail.selectMailsByFolder(sdb, folder);
         //initialize adapter with list of mails
-        mailAdapter = new MailAdapter(Mail.selectMailsByFolder(sdb, folder), getContext());
+        mailAdapter = new MailAdapter(mails, getContext());
         recyclerView.setAdapter(mailAdapter);
         return v;
     }
