@@ -19,7 +19,7 @@ public class FactoryConnection {
      * Get session with messages from post server
      * @param MailSettings        Settings of post server
      * @param String              Use protocol
-     * @return Store              Store of messages from post server
+     * @return Session            Session of messages from post server
      * */
     public Session getSession(MailSettings mailSettings, String protocol) {
         AbstractConnection connection = null;
@@ -40,6 +40,7 @@ public class FactoryConnection {
      * Authentication on post server
      * @param Session             Settings of post server
      * @param MailSettings        Settings of mail
+     * @param MailBox             Email account
      * @return Store              Store of messages from post server
      * */
     public Store authentication(Session session, MailSettings mailSettings,
