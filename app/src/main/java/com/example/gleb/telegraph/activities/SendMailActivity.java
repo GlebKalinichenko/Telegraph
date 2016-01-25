@@ -1,11 +1,14 @@
 package com.example.gleb.telegraph.activities;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Switch;
 
 import com.example.gleb.telegraph.R;
+import com.example.gleb.telegraph.SendMailContext;
+import com.example.gleb.telegraph.SendUsualMail;
 import com.example.gleb.telegraph.abstracts.AbstractActivity;
 import com.example.gleb.telegraph.models.MailBox;
 import com.example.gleb.telegraph.models.MailSettings;
@@ -19,6 +22,8 @@ public class SendMailActivity extends AbstractActivity {
     public static final String MAIL_BOX = "MailBox";
     public static final String MAIL_SETTINGS = "MailSettings";
     private EditText messageEditText;
+    private EditText subjectEditText;
+    private EditText receiversEditText;
     private ImageButton sendImageButton;
     private ImageButton cameraImageButton;
     private ImageButton addSenderImageButton;
@@ -27,6 +32,7 @@ public class SendMailActivity extends AbstractActivity {
     private Switch digestSwitch;
     private MailBox mailBox;
     private MailSettings mailSettings;
+    private SendMailContext sendMailContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,11 +40,23 @@ public class SendMailActivity extends AbstractActivity {
         setContentView(R.layout.activity_send);
 
         initializeWidgets();
-    }
+        sendImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendMailContext = new SendMailContext(new SendUsualMail());
+                sendMailContext.executeSendMail(subjectEditText.getText().toString(),
+                        messageEditText.getText().toString(),
+                        new String[]{receiversEditText.getText().toString()}, false, false,
+                        mailSettings, mailBox);
+                }
+            });
+        }
 
-    @Override
-    protected void initializeWidgets() {
+        @Override
+        protected void initializeWidgets() {
+        subjectEditText = (EditText) findViewById(R.id.subjectEditText);
         messageEditText = (EditText) findViewById(R.id.messageEditText);
+        receiversEditText = (EditText) findViewById(R.id.receiversEditText);
         sendImageButton = (ImageButton) findViewById(R.id.sendImageButton);
         cameraImageButton = (ImageButton) findViewById(R.id.cameraImageButton);
         addSenderImageButton = (ImageButton) findViewById(R.id.addSenderImageButton);
