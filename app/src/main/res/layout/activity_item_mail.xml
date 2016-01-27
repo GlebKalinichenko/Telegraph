@@ -10,7 +10,7 @@
 
         <View
             android:id="@+id/dividerVerticalView"
-            android:background="@color/colorBlue"
+            android:background="@color/colorBlueLight"
             android:layout_width="10dp"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
@@ -44,7 +44,7 @@
 
         <View
             android:id="@+id/dividerSenderView"
-            android:background="@color/colorBlue"
+            android:background="@color/colorBlueLight"
             android:layout_width="10dp"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
@@ -117,7 +117,7 @@
                 android:layout_below="@+id/senderEmailLinearLayout"
                 android:layout_alignLeft="@+id/senderEmailLinearLayout"
                 android:layout_alignStart="@+id/senderEmailLinearLayout"
-                android:textColor="@color/colorBlue"
+                android:textColor="@color/colorBlueLight"
                 android:textSize="15sp"/>
 
             <TextView
