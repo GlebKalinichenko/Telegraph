@@ -170,7 +170,7 @@ public class TelegraphActivity extends AbstractActivity {
      * */
     private void initializeViewPager(List<String> folders){
         viewPagerAdapter = new MailViewPagerAdapter(getSupportFragmentManager(), folders,
-                databaseHelper.getReadableDatabase());
+                databaseHelper.getReadableDatabase(), mailBox);
         viewPager.setAdapter(viewPagerAdapter);
         tabs.setDistributeEvenly(true);
         tabs.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
