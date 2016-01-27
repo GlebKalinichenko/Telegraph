@@ -35,6 +35,10 @@
             android:name=".activities.SendMailActivity"
             android:label="@string/app_name">
         </activity>
+        <activity
+            android:name=".ItemMailActivity"
+            android:label="@string/app_name">
+        </activity>
 
         <receiver android:name=".networkconnection.NetworkStateReceiver" android:enabled="true" android:exported="false">
             <intent-filter>
