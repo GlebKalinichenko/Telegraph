@@ -97,6 +97,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String ID_TYPE_KEY = "IdTypeKey";
     public static final String TYPE_KEY = "TypeKey";
 
+    public static final String CREATE_FOLDER_NAME_INDEX = "CREATE INDEX FolderNameIndex " +
+            "ON Folders(NameFolder);";
+
     public static final String CREATE_MAIL_BOXES = "CREATE TABLE " + TABLE_MAIL_BOXES + " (" +
             ID_MAIL_BOX + " INTEGER PRIMARY KEY AUTOINCREMENT," + EMAIL_ACCOUNT + " TEXT," + PASSWORD_ACCOUNT +
             " TEXT," + RECEIVE_PROTOCOL + " TEXT," + SEND_PROTOCOL + " TEXT" +");";
@@ -172,6 +175,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_MAIL_SETTINGS);
         db.execSQL(CREATE_FOLDERS);
         db.execSQL(CREATE_MAILS);
+        db.execSQL(CREATE_FOLDER_NAME_INDEX);
         db.execSQL(CREATE_USERS);
         db.execSQL(CREATE_ATTACHS);
         db.execSQL(CREATE_USER_KEYS);
