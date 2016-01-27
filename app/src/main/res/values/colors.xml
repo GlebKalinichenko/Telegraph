@@ -8,6 +8,7 @@
     <color name="colorWhite">#ffffffff</color>
     <color name="colorDividerGray">#ffacacac</color>
     <color name="colorGrayLight">#ffe8e8e8</color>
+    <color name="colorBlueLight">#03a9f4</color>
     <string-array name="colors">
         <item>#33b5e5</item>
         <item>#ffbb33</item>
