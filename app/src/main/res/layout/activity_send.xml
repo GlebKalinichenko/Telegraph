@@ -33,7 +33,7 @@
     </LinearLayout>
 
     <View
-        android:id="@+id/verticalView"
+        android:id="@+id/dividerSubjectView"
         style="@style/verticalView"/>
 
     <LinearLayout
