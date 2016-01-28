@@ -7,13 +7,14 @@ import android.database.sqlite.SQLiteStatement;
 import com.example.gleb.telegraph.DatabaseHelper;
 
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by Gleb on 30.12.2015.
  */
-public class Mail {
+public class Mail implements Serializable {
     public static final String INSERT_MAIL = "insert into Mails (SenderUserCode, NameSender, " +
             "Receiver, Subject, Content, FolderCode, Date, HasAttach, StraightIndex) " +
             "values (?, ?, ?, ?, ?, ?, ?, ?, ?);";
@@ -119,7 +120,7 @@ public class Mail {
                 " Mails.Content, Mails.Date, Mails.HasAttach, Mails.StraightIndex " +
                 "from Mails inner join Folders on Mails.FolderCode = Folders.IdFolder " +
                 "inner join Users on Mails.SenderUserCode = Users.IdUser " +
-                "and Folders.NameFolder = '" + folder + "'";
+                "where Folders.NameFolder = '" + folder + "'";
         Cursor cursor = sdb.rawQuery(query, null);
         if (cursor != null && cursor.moveToFirst()) {
             do {

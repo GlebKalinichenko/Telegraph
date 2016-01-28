@@ -9,6 +9,7 @@ import com.example.gleb.telegraph.models.MailSettings;
 import java.util.Date;
 import java.util.Properties;
 
+import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
@@ -52,8 +53,10 @@ public class SendUsualMail extends javax.mail.Authenticator implements SendMailI
         private String message;
         private String[] receivers;
         private Multipart multipart;
+        private MimeMessage msg;
 
-        public SendUsualMailAsyncTask(MailBox mailBox, MailSettings mailSettings, String message, String[] receivers, String subject) {
+        public SendUsualMailAsyncTask(MailBox mailBox, MailSettings mailSettings, String message,
+            String[] receivers, String subject) {
             this.mailBox = mailBox;
             this.mailSettings = mailSettings;
             this.message = message;
@@ -78,20 +81,8 @@ public class SendUsualMail extends javax.mail.Authenticator implements SendMailI
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            MimeMessage msg = new MimeMessage(session);
             try {
-                msg.setFrom(new InternetAddress(mailBox.getEmail()));
-                InternetAddress[] addressTo = new InternetAddress[receivers.length];
-                for (int i = 0; i < receivers.length; i++) {
-                    addressTo[i] = new InternetAddress(receivers[i]);
-                }
-                msg.setRecipients(MimeMessage.RecipientType.TO, addressTo);
-                msg.setSubject(subject);
-                msg.setSentDate(new Date());
-                MimeBodyPart messageBodyPart = new MimeBodyPart();
-                messageBodyPart.setText(message);
-                multipart.addBodyPart(messageBodyPart);
-                msg.setContent(multipart);
+                msg = initializeMessage(multipart, session, mailBox, message, receivers, subject);
                 Transport.send(msg);
             }
             catch(Exception e){
@@ -104,6 +95,33 @@ public class SendUsualMail extends javax.mail.Authenticator implements SendMailI
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
         }
+    }
+
+    /**
+     * Initialize message
+     * @param Multipart     Multipart of mail
+     * @param Session       Session of  send mail
+     * @param MailBox       Email account
+     * @param String        Message of mail
+     * @param String[]      Array of email receivers
+     * @param String        Subject of mail
+     * @return MimeMessage  Initialize mime message
+     * */
+    private MimeMessage initializeMessage(Multipart multipart, Session session, MailBox mailBox,
+        String message, String[] receivers, String subject) throws MessagingException {
+        MimeMessage msg = new MimeMessage(session);
+        msg.setFrom(new InternetAddress(mailBox.getEmail()));
+        InternetAddress[] addressTo = new InternetAddress[receivers.length];
+        for (int i = 0; i < receivers.length; i++)
+            addressTo[i] = new InternetAddress(receivers[i]);
+        msg.setRecipients(MimeMessage.RecipientType.TO, addressTo);
+        msg.setSubject(subject);
+        msg.setSentDate(new Date());
+        MimeBodyPart messageBodyPart = new MimeBodyPart();
+        messageBodyPart.setText(message);
+        multipart.addBodyPart(messageBodyPart);
+        msg.setContent(multipart);
+        return msg;
     }
 
     @Override
