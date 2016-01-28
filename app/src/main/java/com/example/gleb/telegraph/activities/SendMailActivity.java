@@ -2,6 +2,8 @@ package com.example.gleb.telegraph.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -11,6 +13,7 @@ import com.example.gleb.telegraph.R;
 import com.example.gleb.telegraph.SendMailContext;
 import com.example.gleb.telegraph.SendUsualMail;
 import com.example.gleb.telegraph.abstracts.AbstractActivity;
+import com.example.gleb.telegraph.fragments.AttachFragment;
 import com.example.gleb.telegraph.models.MailBox;
 import com.example.gleb.telegraph.models.MailSettings;
 
@@ -67,9 +70,19 @@ public class SendMailActivity extends AbstractActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (data == null) {return;}
         String pathFile = data.getStringExtra("PathFile");
-        pathFiles.add(pathFile);
+        pathFiles.add(pathFile.substring(pathFile.lastIndexOf("/") + 1));
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        AttachFragment attachFragment = new AttachFragment(pathFiles);
+        fragmentTransaction.add(R.id.fragment_container, attachFragment);
+        fragmentTransaction.commitAllowingStateLoss();
     }
 
+    /**
+     * Initialize widgets
+     * @param void
+     * @return void
+     * */
     @Override
     protected void initializeWidgets() {
         subjectEditText = (EditText) findViewById(R.id.subjectEditText);
