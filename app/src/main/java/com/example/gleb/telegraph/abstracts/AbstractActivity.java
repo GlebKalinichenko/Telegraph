@@ -23,4 +23,5 @@ public abstract class AbstractActivity extends AppCompatActivity {
     protected TypedArray navMenuIcons;
     protected NavDrawerAdapter navDrawerAdapter;
     protected abstract void initializeWidgets() throws AddressException;
+    protected abstract void initializeNavigationDrawer() throws AddressException;
 }
