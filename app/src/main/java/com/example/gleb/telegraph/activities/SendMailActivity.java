@@ -10,8 +10,8 @@ import android.widget.ImageButton;
 import android.widget.Switch;
 
 import com.example.gleb.telegraph.R;
-import com.example.gleb.telegraph.SendMailContext;
-import com.example.gleb.telegraph.SendUsualMail;
+import com.example.gleb.telegraph.sendmail.SendMailContext;
+import com.example.gleb.telegraph.sendmail.SendUsualMail;
 import com.example.gleb.telegraph.abstracts.AbstractActivity;
 import com.example.gleb.telegraph.fragments.AttachFragment;
 import com.example.gleb.telegraph.models.MailBox;
@@ -40,6 +40,7 @@ public class SendMailActivity extends AbstractActivity {
     private MailSettings mailSettings;
     private SendMailContext sendMailContext;
     private List<String> pathFiles;
+    private List<String> headerAttachFiles;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +55,7 @@ public class SendMailActivity extends AbstractActivity {
                 sendMailContext.executeSendMail(subjectEditText.getText().toString(),
                         messageEditText.getText().toString(),
                         new String[]{receiversEditText.getText().toString()}, false, false,
-                        mailSettings, mailBox);
+                        mailSettings, mailBox, pathFiles);
             }
         });
         chooseAttachImageButton.setOnClickListener(new View.OnClickListener() {
@@ -70,10 +71,11 @@ public class SendMailActivity extends AbstractActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (data == null) {return;}
         String pathFile = data.getStringExtra("PathFile");
-        pathFiles.add(pathFile.substring(pathFile.lastIndexOf("/") + 1));
+        pathFiles.add(pathFile);
+        headerAttachFiles.add(pathFile.substring(pathFile.lastIndexOf("/") + 1));
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        AttachFragment attachFragment = new AttachFragment(pathFiles);
+        AttachFragment attachFragment = new AttachFragment(headerAttachFiles);
         fragmentTransaction.add(R.id.fragment_container, attachFragment);
         fragmentTransaction.commitAllowingStateLoss();
     }
@@ -97,6 +99,7 @@ public class SendMailActivity extends AbstractActivity {
         mailBox = (MailBox) getIntent().getSerializableExtra(MAIL_BOX);
         mailSettings = (MailSettings) getIntent().getSerializableExtra(MAIL_SETTINGS);
         pathFiles = new ArrayList<>();
+        headerAttachFiles = new ArrayList<>();
     }
 
     /**
