@@ -11,7 +11,7 @@ public class FileChooserUtilities {
 	public static Point displaySize = new Point();
 
 	static {
-		density = ApplicationLoader.applicationContext.getResources()
+		density = FileChooserApplication.applicationContext.getResources()
 				.getDisplayMetrics().density;
 		checkDisplaySize();
 	}
@@ -26,7 +26,7 @@ public class FileChooserUtilities {
 
 	public static void checkDisplaySize() {
 		try {
-			WindowManager manager = (WindowManager) ApplicationLoader.applicationContext
+			WindowManager manager = (WindowManager) FileChooserApplication.applicationContext
 					.getSystemService(Context.WINDOW_SERVICE);
 			if (manager != null) {
 				Display display = manager.getDefaultDisplay();
