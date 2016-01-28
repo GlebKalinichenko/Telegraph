@@ -4,6 +4,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -20,10 +25,13 @@ import com.example.gleb.telegraph.models.MailSettings;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.mail.internet.AddressException;
+
 /**
  * Created by gleb on 22.01.16.
  */
 public class SendMailActivity extends AbstractActivity {
+    public static final String TAG = "Tag";
     public static final String MAIL_BOX = "MailBox";
     public static final String MAIL_SETTINGS = "MailSettings";
     public static final int FILE_CHOOSER = 1;
@@ -36,6 +44,7 @@ public class SendMailActivity extends AbstractActivity {
     private ImageButton chooseAttachImageButton;
     private Switch encryptionSwitch;
     private Switch digestSwitch;
+    private Toolbar toolbar;
     private MailBox mailBox;
     private MailSettings mailSettings;
     private SendMailContext sendMailContext;
@@ -47,7 +56,17 @@ public class SendMailActivity extends AbstractActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_send);
 
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         initializeWidgets();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        try {
+            initializeNavigationDrawer();
+        } catch (AddressException e) {
+            e.printStackTrace();
+        }
+
         sendImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -64,7 +83,12 @@ public class SendMailActivity extends AbstractActivity {
                 loadFileChooser();
             }
         });
-
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "home selected");
+            }
+        });
     }
 
     @Override
@@ -96,10 +120,27 @@ public class SendMailActivity extends AbstractActivity {
         chooseAttachImageButton = (ImageButton) findViewById(R.id.chooseAttachButton);
         encryptionSwitch = (Switch) findViewById(R.id.encryptionSwitch);
         digestSwitch = (Switch) findViewById(R.id.digestSwitch);
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mailBox = (MailBox) getIntent().getSerializableExtra(MAIL_BOX);
         mailSettings = (MailSettings) getIntent().getSerializableExtra(MAIL_SETTINGS);
         pathFiles = new ArrayList<>();
         headerAttachFiles = new ArrayList<>();
+    }
+
+    @Override
+    protected void initializeNavigationDrawer() throws AddressException {
+        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.app_name,
+                R.string.app_name){
+            public void onDrawerClosed(View view) {
+                invalidateOptionsMenu();
+            }
+
+            public void onDrawerOpened(View drawerView) {
+                invalidateOptionsMenu();
+            }
+        };
+        drawerToggle.setDrawerIndicatorEnabled(false);
+        drawerLayout.setDrawerListener(drawerToggle);
     }
 
     /**

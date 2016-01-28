@@ -32,6 +32,7 @@ import java.util.Properties;
 
 import javax.mail.Session;
 import javax.mail.Store;
+import javax.mail.internet.AddressException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -112,6 +113,11 @@ public class SignInActivity extends AbstractActivity {
         passwordEditText = (EditText) findViewById(R.id.edit_password);
         progressView = (CircularProgressView) findViewById(R.id.progress_view);
         databaseHelper = new DatabaseHelper(SignInActivity.this);
+    }
+
+    @Override
+    protected void initializeNavigationDrawer() throws AddressException {
+
     }
 
     public class LoaderAuthentication extends AsyncTask<Void, Void, Boolean> {

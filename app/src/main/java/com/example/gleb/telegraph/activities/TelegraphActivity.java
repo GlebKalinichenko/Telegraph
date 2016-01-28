@@ -113,7 +113,8 @@ public class TelegraphActivity extends AbstractActivity {
      * @param void
      * @return void
      * */
-    private void initializeNavigationDrawer() throws AddressException {
+    @Override
+    protected void initializeNavigationDrawer() throws AddressException {
         ArrayList<NavDrawerItem> navDrawerItems = new ArrayList<NavDrawerItem>();
         navDrawerItems.add(new NavDrawerItem(navMenuTitles[0], navMenuIcons.getResourceId(0, -1)));
         navDrawerItems.add(new NavDrawerItem(navMenuTitles[1], navMenuIcons.getResourceId(1, -1)));
