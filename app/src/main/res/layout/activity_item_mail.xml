@@ -1,167 +1,189 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical" android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:id="@+id/subjectRelativeLayout">
-
-        <View
-            android:id="@+id/dividerVerticalView"
-            android:background="@color/colorBlueLight"
-            android:layout_width="10dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Subject"
-            android:id="@+id/subjectTextView"
-            android:textColor="#000"
-            android:textSize="20sp"
-            android:layout_marginLeft="15dp"
-            android:layout_centerVertical="true"
-            android:layout_toRightOf="@+id/dividerVerticalView"
-            android:layout_toEndOf="@+id/dividerVerticalView" />
-
-    </RelativeLayout>
-
-    <View
-        android:id="@+id/dividerSubjectView"
-        style="@style/verticalView"
-        android:layout_below="@id/subjectRelativeLayout"/>
-
-    <RelativeLayout
-        android:id="@+id/senderEmailRelativeLayout"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_below="@+id/dividerSubjectView">
-
-        <View
-            android:id="@+id/dividerSenderView"
-            android:background="@color/colorBlueLight"
-            android:layout_width="10dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
-
-        <View
-            android:id="@+id/icon_circle"
-            android:transitionName="@string/transition_name_circle"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="@drawable/circle"
-            android:layout_centerVertical="true"
-            android:layout_toRightOf="@+id/dividerSenderView"
-            android:layout_toEndOf="@+id/dividerSenderView"
-            android:layout_marginLeft="15dp"/>
-
-        <LinearLayout
-            android:orientation="horizontal"
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/coordinate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/icon_circle"
-            android:layout_marginLeft="15dp"
-            android:id="@+id/senderEmailLinearLayout">
+            android:theme="@style/AppTheme.AppBarOverlay">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+        </android.support.design.widget.AppBarLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:id="@+id/subjectRelativeLayout"
+            android:layout_below="@id/coordinate">
+
+            <View
+                android:id="@+id/dividerVerticalView"
+                android:background="@color/colorBlueLight"
+                android:layout_width="10dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
 
             <TextView
-                android:id="@+id/senderEmailTextView"
-                android:transitionName="@string/transition_name_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Jonh Doe"
+                android:text="Subject"
+                android:id="@+id/subjectTextView"
                 android:textColor="#000"
-                android:textSize="18sp"
-                android:singleLine="true"
-                android:layout_weight="1"/>
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/attachImageView"
-                android:src="@drawable/attachment"
-                android:visibility="invisible"
-                android:layout_marginRight="5dp"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="10:00"
-                android:id="@+id/dateTextView"
-                android:layout_alignTop="@+id/icon_circle"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="15dp"
-            android:layout_toRightOf="@id/icon_circle"
-            android:id="@+id/receiverEmailLinearLayout"
-            android:layout_below="@+id/senderEmailLinearLayout">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="receiver,"
-                android:id="@+id/textView"
-                android:layout_below="@+id/senderEmailLinearLayout"
-                android:layout_alignLeft="@+id/senderEmailLinearLayout"
-                android:layout_alignStart="@+id/senderEmailLinearLayout"
-                android:textColor="@color/colorBlueLight"
-                android:textSize="15sp"/>
-
-            <TextView
-                android:id="@+id/receiverEmailTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="John@gmail.com"
-                android:transitionName="@string/transition_name_phone"
-                android:textColor="#9f9f9f"
-                android:textSize="15sp"
-                android:layout_marginLeft="10dp"
-                android:singleLine="true"
-                android:layout_weight="1"/>
-
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/imageButton"
-                android:background="@drawable/star"
-                android:layout_below="@+id/dateTextView"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true" />
-
-        </LinearLayout>
-    </RelativeLayout>
-
-    <View
-        android:id="@+id/dividerBottomView"
-        style="@style/verticalView"
-        android:layout_below="@+id/senderEmailRelativeLayout"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/dividerBottomView"
-        android:layout_margin="20dp">
-
-        <WebView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/webView" />
+                android:textSize="20sp"
+                android:layout_marginLeft="15dp"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/dividerVerticalView"
+                android:layout_toEndOf="@+id/dividerVerticalView" />
 
         </RelativeLayout>
 
-</RelativeLayout>
+        <View
+            android:id="@+id/dividerSubjectView"
+            style="@style/verticalView"
+            android:layout_below="@id/subjectRelativeLayout"/>
+
+        <RelativeLayout
+            android:id="@+id/senderEmailRelativeLayout"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_below="@+id/dividerSubjectView">
+
+            <View
+                android:id="@+id/dividerSenderView"
+                android:background="@color/colorBlueLight"
+                android:layout_width="10dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
+
+            <View
+                android:id="@+id/icon_circle"
+                android:transitionName="@string/transition_name_circle"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/circle"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/dividerSenderView"
+                android:layout_toEndOf="@+id/dividerSenderView"
+                android:layout_marginLeft="15dp"/>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/icon_circle"
+                android:layout_marginLeft="15dp"
+                android:id="@+id/senderEmailLinearLayout">
+
+                <TextView
+                    android:id="@+id/senderEmailTextView"
+                    android:transitionName="@string/transition_name_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Jonh Doe"
+                    android:textColor="#000"
+                    android:textSize="18sp"
+                    android:singleLine="true"
+                    android:layout_weight="1"/>
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/attachImageView"
+                    android:src="@drawable/attachment"
+                    android:visibility="invisible"
+                    android:layout_marginRight="5dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="10:00"
+                    android:id="@+id/dateTextView"
+                    android:layout_alignTop="@+id/icon_circle"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_toRightOf="@id/icon_circle"
+                android:id="@+id/receiverEmailLinearLayout"
+                android:layout_below="@+id/senderEmailLinearLayout">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="receiver,"
+                    android:id="@+id/textView"
+                    android:layout_below="@+id/senderEmailLinearLayout"
+                    android:layout_alignLeft="@+id/senderEmailLinearLayout"
+                    android:layout_alignStart="@+id/senderEmailLinearLayout"
+                    android:textColor="@color/colorBlueLight"
+                    android:textSize="15sp"/>
+
+                <TextView
+                    android:id="@+id/receiverEmailTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="John@gmail.com"
+                    android:transitionName="@string/transition_name_phone"
+                    android:textColor="#9f9f9f"
+                    android:textSize="15sp"
+                    android:layout_marginLeft="10dp"
+                    android:singleLine="true"
+                    android:layout_weight="1"/>
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/imageButton"
+                    android:background="@drawable/star"
+                    android:layout_below="@+id/dateTextView"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true" />
+
+            </LinearLayout>
+        </RelativeLayout>
+
+        <View
+            android:id="@+id/dividerBottomView"
+            style="@style/verticalView"
+            android:layout_below="@+id/senderEmailRelativeLayout"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/dividerBottomView"
+            android:layout_margin="20dp">
+
+            <WebView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/webView" />
+
+            </RelativeLayout>
+
+    </RelativeLayout>
+</android.support.v4.widget.DrawerLayout>
