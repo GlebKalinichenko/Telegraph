@@ -2,7 +2,11 @@ package com.example.gleb.telegraph.activities;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -29,18 +33,34 @@ public class ItemMailActivity extends AbstractActivity {
     private TextView receiverEmailTextView;
     private TextView dateTextView;
     private WebView webView;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item_mail);
 
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         try {
             initializeWidgets();
             initializeMessage();
         } catch (AddressException e) {
             e.printStackTrace();
         }
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        try {
+            initializeNavigationDrawer();
+        } catch (AddressException e) {
+            e.printStackTrace();
+        }
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
     }
 
     /**
@@ -57,11 +77,23 @@ public class ItemMailActivity extends AbstractActivity {
         receiverEmailTextView = (TextView) findViewById(R.id.receiverEmailTextView);
         dateTextView = (TextView) findViewById(R.id.dateTextView);
         webView = (WebView) findViewById(R.id.webView);
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
     }
 
     @Override
     protected void initializeNavigationDrawer() throws AddressException {
+        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.app_name,
+                R.string.app_name){
+            public void onDrawerClosed(View view) {
+                invalidateOptionsMenu();
+            }
 
+            public void onDrawerOpened(View drawerView) {
+                invalidateOptionsMenu();
+            }
+        };
+        drawerToggle.setDrawerIndicatorEnabled(false);
+        drawerLayout.setDrawerListener(drawerToggle);
     }
 
     /**
