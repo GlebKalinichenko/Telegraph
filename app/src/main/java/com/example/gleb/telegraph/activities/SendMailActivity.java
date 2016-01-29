@@ -86,7 +86,7 @@ public class SendMailActivity extends AbstractActivity {
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(TAG, "home selected");
+                onBackPressed();
             }
         });
     }
