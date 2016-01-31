@@ -29,4 +29,11 @@ dependencies {
     compile 'de.greenrobot:eventbus:2.4.0'
     compile 'com.android.support:recyclerview-v7:+'
     compile 'com.google.android.gms:play-services-appindexing:8.1.0'
+    compile('com.github.afollestad.material-dialogs:core:0.8.5.3@aar') {
+        transitive = true
+    }
+    compile('com.github.afollestad.material-dialogs:commons:0.8.5.3@aar') {
+        transitive = true
+    }
+    compile project(':filechooser')
 }
