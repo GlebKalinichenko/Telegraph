@@ -12,7 +12,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.example.gleb.telegraph.R;
 import com.example.gleb.telegraph.abstracts.AbstractActivity;
 import com.example.gleb.telegraph.models.Mail;
@@ -105,7 +104,7 @@ public class ItemMailActivity extends AbstractActivity {
         subjectTextView.setText(mail.getSubject());
         senderEmailTextView.setText(mail.getSender());
         receiverEmailTextView.setText(mailBox.getEmail());
-        dateTextView.setText(mail.getDate());
+        dateTextView.setText(mail.getDate().substring(0, 5));
 
 //        webView.getSettings().setJavaScriptEnabled(true);
 //        String content = "<html><head><meta name=\"viewport\" content=\"width=device-width\"/>" +
