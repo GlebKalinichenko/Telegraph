@@ -1,20 +1,25 @@
 package com.example.gleb.telegraph.activities;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Switch;
+import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.afollestad.materialdialogs.simplelist.MaterialSimpleListAdapter;
+import com.afollestad.materialdialogs.simplelist.MaterialSimpleListItem;
+import com.example.gleb.telegraph.DatabaseHelper;
 import com.example.gleb.telegraph.R;
+import com.example.gleb.telegraph.models.User;
 import com.example.gleb.telegraph.sendmail.SendMailContext;
 import com.example.gleb.telegraph.sendmail.SendUsualMail;
 import com.example.gleb.telegraph.abstracts.AbstractActivity;
@@ -89,6 +94,24 @@ public class SendMailActivity extends AbstractActivity {
                 onBackPressed();
             }
         });
+        addSenderImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final MaterialSimpleListAdapter adapter = new MaterialSimpleListAdapter(SendMailActivity.this);
+                List<User> users = User.selectUsers(databaseHelper.getReadableDatabase());
+                initializeAlertSender(users, adapter);
+                new MaterialDialog.Builder(SendMailActivity.this)
+                    .title(R.string.choose_email)
+                    .adapter(adapter, new MaterialDialog.ListCallback() {
+                        @Override
+                        public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
+                            MaterialSimpleListItem item = adapter.getItem(which);
+                            receiversEditText.setText(item.getContent());
+                        }
+                    }).negativeText(R.string.cancel).positiveText(R.string.ok)
+                    .show();
+            }
+        });
     }
 
     @Override
@@ -123,6 +146,7 @@ public class SendMailActivity extends AbstractActivity {
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mailBox = (MailBox) getIntent().getSerializableExtra(MAIL_BOX);
         mailSettings = (MailSettings) getIntent().getSerializableExtra(MAIL_SETTINGS);
+        databaseHelper = new DatabaseHelper(SendMailActivity.this);
         pathFiles = new ArrayList<>();
         headerAttachFiles = new ArrayList<>();
     }
@@ -141,6 +165,22 @@ public class SendMailActivity extends AbstractActivity {
         };
         drawerToggle.setDrawerIndicatorEnabled(false);
         drawerLayout.setDrawerListener(drawerToggle);
+    }
+
+    /**
+     * Load file chooser for choose file to attach
+     * @param List<User>                    Array of emails of senders
+     * @param MaterialSimpleListAdapter     Adapter for show emails in alert
+     * @return void
+     * */
+    private void initializeAlertSender(List<User> users, MaterialSimpleListAdapter adapter) {
+        for (User user : users) {
+            adapter.add(new MaterialSimpleListItem.Builder(SendMailActivity.this)
+                    .content(user.getEmail())
+                    .icon(R.mipmap.ic_account_circle)
+                    .backgroundColor(Color.WHITE)
+                    .build());
+        }
     }
 
     /**
