@@ -8,12 +8,17 @@ import android.database.sqlite.SQLiteStatement;
 import com.example.gleb.telegraph.DatabaseHelper;
 import com.example.gleb.telegraph.abstracts.AbstractUser;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.mail.Folder;
 
 /**
  * Created by Gleb on 30.12.2015.
  */
 public class User extends AbstractUser {
+    public static final String SELECT_USERS = "Select Email from Users";
+
     public User(String email) {
         super(email);
     }
@@ -54,6 +59,23 @@ public class User extends AbstractUser {
             sdb.close();
             return 0;
         }
+    }
+
+    /**
+     * Select users from table Users
+     * @param SQLiteDatabase        Database
+     * @return List<User>           Array of selected users
+     * */
+    public static List<User> selectUsers(SQLiteDatabase sdb){
+        List<User> users = new ArrayList<>();
+        Cursor cursor = sdb.rawQuery(SELECT_USERS, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                users.add(new User(cursor.getString(0)));
+            }
+            while (cursor.moveToNext());
+        }
+        return users;
     }
 
     /**
