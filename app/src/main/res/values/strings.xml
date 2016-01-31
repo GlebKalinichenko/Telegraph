@@ -11,6 +11,9 @@
     <string name="choose_file">Select a file</string>
     <string name="error_selecting_file">Error selecting File</string>
     <string name="internal_storage">Internal storage</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">Ok</string>
+    <string name="choose_email">Select email</string>
     <string-array name="nav_drawer_items">
         <item >Home</item>
         <item >Inbox</item>

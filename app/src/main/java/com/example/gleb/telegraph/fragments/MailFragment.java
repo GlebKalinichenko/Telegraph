@@ -10,7 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.gleb.telegraph.ItemMailActivity;
+import com.example.gleb.telegraph.activities.ItemMailActivity;
 import com.example.gleb.telegraph.RecyclerClickListener;
 import com.example.gleb.telegraph.models.MailBox;
 import com.example.gleb.telegraph.recyclerviews.MailAdapter;

@@ -1,4 +1,4 @@
-package com.example.gleb.telegraph;
+package com.example.gleb.telegraph.sendmail;
 
 import android.os.AsyncTask;
 
@@ -6,9 +6,15 @@ import com.example.gleb.telegraph.properties.FactoryProperties;
 import com.example.gleb.telegraph.models.MailBox;
 import com.example.gleb.telegraph.models.MailSettings;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
+import javax.mail.BodyPart;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.PasswordAuthentication;
@@ -24,6 +30,7 @@ import javax.mail.internet.MimeMultipart;
  */
 public class SendUsualMail extends javax.mail.Authenticator implements SendMailInterface {
     private MailBox mailBox;
+    private List<String> attachFiles;
 
     /**
      * Send usual mail
@@ -38,9 +45,10 @@ public class SendUsualMail extends javax.mail.Authenticator implements SendMailI
      * */
     @Override
     public boolean sendMail(String subject, String message, String[] receivers, boolean hasEncryption,
-        boolean hasDigest, MailSettings mailSettings, MailBox mailBox) {
+        boolean hasDigest, MailSettings mailSettings, MailBox mailBox, List<String> attachFiles) {
         this.mailBox = mailBox;
-        new SendUsualMailAsyncTask(mailBox, mailSettings, message, receivers, subject).execute();
+        this.attachFiles = attachFiles;
+        new SendUsualMailAsyncTask(mailBox, mailSettings, message, receivers, subject, attachFiles).execute();
         return true;
     }
 
@@ -54,14 +62,16 @@ public class SendUsualMail extends javax.mail.Authenticator implements SendMailI
         private String[] receivers;
         private Multipart multipart;
         private MimeMessage msg;
+        private List<String> attachFiles;
 
         public SendUsualMailAsyncTask(MailBox mailBox, MailSettings mailSettings, String message,
-            String[] receivers, String subject) {
+            String[] receivers, String subject, List<String> attachFiles) {
             this.mailBox = mailBox;
             this.mailSettings = mailSettings;
             this.message = message;
             this.receivers = receivers;
             this.subject = subject;
+            this.attachFiles = attachFiles;
         }
 
         @Override
@@ -82,7 +92,8 @@ public class SendUsualMail extends javax.mail.Authenticator implements SendMailI
                 e.printStackTrace();
             }
             try {
-                msg = initializeMessage(multipart, session, mailBox, message, receivers, subject);
+                msg = initializeMessage(multipart, session, mailBox, message, receivers, subject,
+                        attachFiles);
                 Transport.send(msg);
             }
             catch(Exception e){
@@ -108,7 +119,7 @@ public class SendUsualMail extends javax.mail.Authenticator implements SendMailI
      * @return MimeMessage  Initialize mime message
      * */
     private MimeMessage initializeMessage(Multipart multipart, Session session, MailBox mailBox,
-        String message, String[] receivers, String subject) throws MessagingException {
+        String message, String[] receivers, String subject, List<String> attachFiles) throws Exception {
         MimeMessage msg = new MimeMessage(session);
         msg.setFrom(new InternetAddress(mailBox.getEmail()));
         InternetAddress[] addressTo = new InternetAddress[receivers.length];
@@ -121,7 +132,25 @@ public class SendUsualMail extends javax.mail.Authenticator implements SendMailI
         messageBodyPart.setText(message);
         multipart.addBodyPart(messageBodyPart);
         msg.setContent(multipart);
+        if (attachFiles.size() != 0)
+           initializeAttachment(multipart, attachFiles);
         return msg;
+    }
+
+    /**
+     * Add attach file to send mail
+     * @param Multipart     Multipart of mail
+     * @param List<String>  Array with files to attach
+     * @return void
+     * */
+    private void initializeAttachment(Multipart multipart, List<String> filename) throws Exception {
+        for (String name : filename) {
+            BodyPart messageBodyPart = new MimeBodyPart();
+            DataSource source = new FileDataSource(name);
+            messageBodyPart.setDataHandler(new DataHandler(source));
+            messageBodyPart.setFileName(name.substring(name.lastIndexOf("/") + 1));
+            multipart.addBodyPart(messageBodyPart);
+        }
     }
 
     @Override

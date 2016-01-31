@@ -1,12 +1,4 @@
-package com.example.gleb.telegraph.filechooser;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
+package com.example.filechooser;
 
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
@@ -29,7 +21,13 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.example.gleb.telegraph.R;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
 
 public class DirectoryFragment extends Fragment {
 

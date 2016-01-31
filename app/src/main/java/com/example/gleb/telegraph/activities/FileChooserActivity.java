@@ -9,8 +9,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 
+import com.example.filechooser.DirectoryFragment;
 import com.example.gleb.telegraph.R;
-import com.example.gleb.telegraph.filechooser.DirectoryFragment;
 
 public class FileChooserActivity extends ActionBarActivity {
 	private Toolbar toolbar;

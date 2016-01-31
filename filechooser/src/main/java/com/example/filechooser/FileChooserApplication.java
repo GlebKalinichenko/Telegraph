@@ -1,4 +1,4 @@
-package com.example.gleb.telegraph.filechooser;
+package com.example.filechooser;
 
 import android.app.Application;
 import android.content.Context;

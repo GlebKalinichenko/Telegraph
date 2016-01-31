@@ -6,7 +6,7 @@
  * Copyright Nikolai Kudashov, 2013-2014.
  */
 
-package com.example.gleb.telegraph.filechooser;
+package com.example.filechooser;
 
 import android.database.DataSetObserver;
 import android.view.View;
