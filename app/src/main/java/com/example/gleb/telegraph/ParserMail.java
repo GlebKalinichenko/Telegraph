@@ -54,7 +54,7 @@ public class ParserMail {
         //id of email account
         int mailBoxCode = MailBox.getAccountByName(databaseHelper.getReadableDatabase(), emailReceiver);
         //list of id folders for email account
-        List<Integer> idFolders = getIdFolders(databaseHelper.getReadableDatabase(), folders, mailBoxCode);
+        List<Integer> idFolders = MailFolder.getIdFolders(databaseHelper.getReadableDatabase(), folders, mailBoxCode);
         //id of inserted mails
         final List<Integer> ids = MailFolder.addFolders(databaseHelper, folders, mailBoxCode, idFolders);
         final List<Thread> threads = new ArrayList<>();
@@ -67,6 +67,8 @@ public class ParserMail {
                         f.open(Folder.READ_ONLY);
                         FlagTerm ft = new FlagTerm(new Flags(Flags.Flag.USER), false);
                         Message[] messages = f.search(ft);
+                        //check is inbox folder for save current num of mails to application
+                        isInboxMessages(f.getName(), messages.length);
                         if (messages.length != 0)
                             parsePostMessage(messages, ids.get(finalI));
                     } catch (MessagingException e) {
@@ -293,24 +295,14 @@ public class ParserMail {
         return name;
     }
 
-    public static List<Integer> getIdFolders(final SQLiteDatabase sdb, Folder[] folders, final int mailBoxCode){
-        final List<Integer> ids = new ArrayList<>();
-        List<Thread> threads = new ArrayList<>();
-        for (final Folder f : folders){
-            final Thread thread = new Thread(new Runnable() {
-                public void run() {
-                    int idFolder = MailFolder.selectFolderByNameAndMailBoxCode(sdb, f.getName(), mailBoxCode);
-                    ids.add(idFolder);
-                }});
-            thread.start();
-            threads.add(thread);
-        }
-        for (Thread thread : threads)
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        return ids;
+    /**
+     * Check is current folder is inbox for save num of mails to equals
+     * @param String         Name of folder
+     * @param int            Num of messages of current folder
+     * @return void
+     * */
+    public static void isInboxMessages(String folder, int numMessages){
+        if (folder.toLowerCase().contains("inbox") || folder.toLowerCase().contains("входящие"))
+            MessageApplication.setNumMessage(numMessages);
     }
 }
