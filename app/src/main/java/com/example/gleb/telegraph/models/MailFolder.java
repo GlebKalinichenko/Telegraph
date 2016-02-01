@@ -107,6 +107,16 @@ public class MailFolder {
     }
 
     /**
+     * Remove folders from database by mail box code
+     * @param SQLiteDatabase        Database
+     * @param int                   Code of mail box account
+     * */
+    public static void removeFoldersByMailCode(SQLiteDatabase sdb, int mailBoxCode){
+        String query = "Delete from Folders where MailBoxCode='" + mailBoxCode + "'";
+        sdb.rawQuery(query, null);
+    }
+
+    /**
      * Get name of folders for show on view pager
      * @param Folder[]              Array of folders
      * @return List<String>         Array names of folders
