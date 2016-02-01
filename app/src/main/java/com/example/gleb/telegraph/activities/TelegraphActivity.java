@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.gleb.telegraph.DatabaseHelper;
+import com.example.gleb.telegraph.MailService;
 import com.example.gleb.telegraph.ParserMail;
 import com.example.gleb.telegraph.R;
 import com.example.gleb.telegraph.abstracts.AbstractActivity;
@@ -327,6 +328,7 @@ public class TelegraphActivity extends AbstractActivity {
                     + String.valueOf(endtime - startTime), Toast.LENGTH_LONG).show();
             progressView.setVisibility(View.INVISIBLE);
             initializeViewPager(MailFolder.folderToString(folders));
+            startService(new Intent(TelegraphActivity.this, MailService.class));
         }
     }
 }
