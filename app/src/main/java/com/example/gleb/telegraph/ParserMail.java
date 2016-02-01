@@ -1,12 +1,7 @@
 package com.example.gleb.telegraph;
 
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteStatement;
-
 import com.example.gleb.telegraph.models.Attach;
 import com.example.gleb.telegraph.models.Mail;
-import com.example.gleb.telegraph.models.MailBox;
 import com.example.gleb.telegraph.models.MailFolder;
 import com.example.gleb.telegraph.models.StraightIndex;
 import com.example.gleb.telegraph.models.User;
@@ -36,10 +31,15 @@ import javax.mail.search.FlagTerm;
 public class ParserMail {
     private String emailReceiver;
     private DatabaseHelper databaseHelper;
+    private int curOffsetMails;
+    private int prevOffsetMails;
 
-    public ParserMail(String emailReceiver, DatabaseHelper databaseHelper) {
+    public ParserMail(String emailReceiver, DatabaseHelper databaseHelper, int curOffsetMails,
+        int prevOffsetMails) {
         this.emailReceiver = emailReceiver;
         this.databaseHelper = databaseHelper;
+        this.curOffsetMails = curOffsetMails;
+        this.prevOffsetMails = prevOffsetMails;
     }
 
     /**
@@ -98,8 +98,8 @@ public class ParserMail {
         int hasAttach = 0;
         Mail mail;
 
-        if (messages.length > 5) {
-            for (int i = messages.length - 1; i > messages.length - 5; i--) {
+        if (messages.length > 5 * curOffsetMails) {
+            for (int i = messages.length - 1 - 5 * prevOffsetMails; i > messages.length - 5 * curOffsetMails; i--) {
                 emailSender = parseEmailAddress(messages[i]);
                 nameSender = parseNameEmail(messages[i]);
                 date = parseDate(messages[i]);
