@@ -5,6 +5,9 @@ import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
 
+import com.example.gleb.telegraph.models.MailBox;
+import com.example.gleb.telegraph.models.MailSettings;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -12,6 +15,19 @@ public class MailService extends Service {
     public static final long NOTIFY_INTERVAL = 10 * 1000;
     private Handler mHandler = new Handler();
     private Timer mTimer = null;
+    private MailBox mailBox;
+    private MailSettings mailSettings;
+    private int curOffsetMails;
+    private int prevOffsetMails;
+
+    public MailService(MailBox mailBox, MailSettings mailSettings, int curOffsetMails,
+        int prevOffsetMails) {
+        this.mailBox = mailBox;
+        this.mailSettings = mailSettings;
+        this.curOffsetMails = curOffsetMails;
+        this.prevOffsetMails = prevOffsetMails;
+    }
+
     public MailService() {
     }
 
@@ -39,9 +55,8 @@ public class MailService extends Service {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    
-                }
 
+                }
             });
         }
     }
