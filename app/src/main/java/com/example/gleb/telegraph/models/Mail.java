@@ -120,7 +120,7 @@ public class Mail implements Serializable {
                 " Mails.Content, Mails.Date, Mails.HasAttach, Mails.StraightIndex " +
                 "from Mails inner join Folders on Mails.FolderCode = Folders.IdFolder " +
                 "inner join Users on Mails.SenderUserCode = Users.IdUser " +
-                "where Folders.NameFolder = '" + folder + "'";
+                "where Folders.NameFolder = '" + folder + "' order by Mails.Date ASC";
         Cursor cursor = sdb.rawQuery(query, null);
         if (cursor != null && cursor.moveToFirst()) {
             do {
