@@ -150,4 +150,32 @@ public class MailFolder {
         }
         return folders;
     }
+
+    /**
+     * Get id folders for current array of folders
+     * @param SQLiteDatabase        Database
+     * @param Folder[]              Array of folders
+     * @param int                   Id of mail box account
+     * @return List<Integer>        Array of id folders
+     * */
+    public static List<Integer> getIdFolders(final SQLiteDatabase sdb, Folder[] folders, final int mailBoxCode){
+        final List<Integer> ids = new ArrayList<>();
+        List<Thread> threads = new ArrayList<>();
+        for (final Folder f : folders){
+            final Thread thread = new Thread(new Runnable() {
+                public void run() {
+                    int idFolder = MailFolder.selectFolderByNameAndMailBoxCode(sdb, f.getName(), mailBoxCode);
+                    ids.add(idFolder);
+                }});
+            thread.start();
+            threads.add(thread);
+        }
+        for (Thread thread : threads)
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        return ids;
+    }
 }
