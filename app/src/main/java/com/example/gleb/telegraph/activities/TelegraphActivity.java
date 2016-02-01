@@ -1,6 +1,7 @@
 package com.example.gleb.telegraph.activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -10,6 +11,8 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -47,6 +50,8 @@ import javax.mail.internet.AddressException;
 public class TelegraphActivity extends AbstractActivity {
     public static final String MAIL_BOX = "MailBox";
     public static final String MAIL_SETTINGS = "MailSettings";
+    public static final String SETTINGS = "Settings";
+    public static final String OFFSET_NUM_LOAD_MAIL = "OffsetNumLoadMail";
     private MailBox mailBox;
     private MailSettings mailSettings;
     private CircularProgressView progressView;
@@ -55,6 +60,9 @@ public class TelegraphActivity extends AbstractActivity {
     private ViewPager viewPager;
     private SlidingTabLayout tabs;
     final long startTime = System.currentTimeMillis();
+    private SharedPreferences settings;
+    private int curOffsetMails;
+    private int prevOffsetMails;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +91,29 @@ public class TelegraphActivity extends AbstractActivity {
         new Loader(mailBox, mailSettings).execute();
     }
 
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_telegraph, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id){
+            case R.id.load_mails:
+                curOffsetMails++;
+                prevOffsetMails = curOffsetMails - 1;
+                saveOffsetMails();
+                progressView.setVisibility(View.VISIBLE);
+                progressView.startAnimation();
+                new Loader(mailBox, mailSettings).execute();
+                return true;
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
     /**
      * Initialize widgets
      * @param void
@@ -183,6 +214,40 @@ public class TelegraphActivity extends AbstractActivity {
         tabs.setViewPager(viewPager);
     }
 
+    /**
+     * Load offset mail from shared preferences
+     * @params void
+     * @return void
+     * */
+    private void loadOffsetMails(){
+        settings = getSharedPreferences(SETTINGS, MODE_PRIVATE);
+        curOffsetMails = settings.getInt(OFFSET_NUM_LOAD_MAIL, 1);
+        prevOffsetMails = curOffsetMails - 1;
+    }
+
+    /**
+     * Save offset mail from shared preferences
+     * @params void
+     * @return void
+     * */
+    private void saveOffsetMails(){
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putInt(OFFSET_NUM_LOAD_MAIL, curOffsetMails);
+        editor.apply();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadOffsetMails();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        saveOffsetMails();
+    }
+
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -229,7 +294,8 @@ public class TelegraphActivity extends AbstractActivity {
             try {
                 if (store != null) {
                     folders = store.getDefaultFolder().list();
-                    ParserMail parserMail = new ParserMail(mailBox.getEmail(), databaseHelper);
+                    ParserMail parserMail = new ParserMail(mailBox.getEmail(), databaseHelper,
+                            curOffsetMails, prevOffsetMails);
                     parserMail.parseFolder(folders);
                 }
             } catch (MessagingException e) {
