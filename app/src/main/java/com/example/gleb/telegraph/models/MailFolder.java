@@ -49,21 +49,27 @@ public class MailFolder {
      * @param Folder[]              Array of folders
      * @return void
      * */
-    public static List<Integer> addFolders(DatabaseHelper databaseHelper, Folder[] folders){
+    public static List<Integer> addFolders(DatabaseHelper databaseHelper, Folder[] folders, int mailBoxCode,
+            List<Integer> idFolders){
         SQLiteDatabase sdb = databaseHelper.getWritableDatabase();
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
         List<Integer> ids = new ArrayList<>();
         String sql = "insert into Folders (NameFolder, MailBoxCode) values (?, ?);";
         SQLiteStatement stmt = sdb.compileStatement(sql);
         sdb.beginTransaction();
-        for (Folder f : folders){
-            MailFolder folder = new MailFolder(f.getName());
-            stmt.bindString(1, folder.getFolder());
-            //get code of folder from database
-            stmt.bindLong(2, MailBox.getLastAccount(db));
-            long entryID = stmt.executeInsert();
-            ids.add((int) entryID);
-            stmt.clearBindings();
+        for (int i = 0; i < folders.length; i++){
+            if (idFolders.get(i) == 0) {
+                MailFolder folder = new MailFolder(folders[i].getName());
+                stmt.bindString(1, folder.getFolder());
+                //get code of folder from database
+                stmt.bindLong(2, mailBoxCode);
+                long entryID = stmt.executeInsert();
+                ids.add((int) entryID);
+                stmt.clearBindings();
+            }
+            else{
+                ids.add(idFolders.get(i));
+            }
         }
         sdb.setTransactionSuccessful();
         sdb.endTransaction();
@@ -107,12 +113,28 @@ public class MailFolder {
     }
 
     /**
+     * Select folders by conditions of name of folder and mail box code
+     * @param SQLiteDatabase        Database
+     * @param String                Name of folder
+     * @param int                   Id of mail box account
+     * @return int                  Code of folder in database
+     * */
+    public static int selectFolderByNameAndMailBoxCode(SQLiteDatabase sdb, String nameFolder, int mailBoxCode){
+        String query = "Select IdFolder from Folders where NameFolder='" + nameFolder +
+                "' and MailBoxCode='" + mailBoxCode + "'";
+        Cursor cursor = sdb.rawQuery(query, null);
+        if (cursor != null && cursor.moveToFirst())
+            return cursor.getInt(0);
+        return 0;
+    }
+
+    /**
      * Remove folders from database by mail box code
      * @param SQLiteDatabase        Database
      * @param int                   Code of mail box account
      * */
     public static void removeFoldersByMailCode(SQLiteDatabase sdb, int mailBoxCode){
-        String query = "Delete from Folders where MailBoxCode='" + mailBoxCode + "'";
+        String query = "Delete from Folders where IdFolder='" + 3 + "'";
         sdb.rawQuery(query, null);
     }
 
