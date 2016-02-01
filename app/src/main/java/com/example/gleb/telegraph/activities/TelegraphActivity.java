@@ -3,6 +3,7 @@ package com.example.gleb.telegraph.activities;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -246,6 +247,16 @@ public class TelegraphActivity extends AbstractActivity {
     protected void onPause() {
         super.onPause();
         saveOffsetMails();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        SQLiteDatabase sdb = databaseHelper.getReadableDatabase();
+        List<String> folders = MailFolder.selectFolders(sdb);
+        MailFolder.removeFoldersByMailCode(sdb, MailBox.getAccountByName(sdb, mailBox.getEmail()));
+        folders = MailFolder.selectFolders(sdb);
+        int value = folders.size();
     }
 
     @Override
