@@ -1,7 +1,10 @@
 package com.example.gleb.telegraph;
 
+import android.database.sqlite.SQLiteDatabase;
+
 import com.example.gleb.telegraph.models.Attach;
 import com.example.gleb.telegraph.models.Mail;
+import com.example.gleb.telegraph.models.MailBox;
 import com.example.gleb.telegraph.models.MailFolder;
 import com.example.gleb.telegraph.models.StraightIndex;
 import com.example.gleb.telegraph.models.User;
@@ -48,7 +51,12 @@ public class ParserMail {
      * @return void
      * */
     public void parseFolder(Folder[] folders) throws MessagingException, IOException {
-        final List<Integer> ids = MailFolder.addFolders(databaseHelper, folders);
+        //id of email account
+        int mailBoxCode = MailBox.getAccountByName(databaseHelper.getReadableDatabase(), emailReceiver);
+        //list of id folders for email account
+        List<Integer> idFolders = getIdFolders(databaseHelper.getReadableDatabase(), folders, mailBoxCode);
+        //id of inserted mails
+        final List<Integer> ids = MailFolder.addFolders(databaseHelper, folders, mailBoxCode, idFolders);
         final List<Thread> threads = new ArrayList<>();
         for (int i = 0; i < folders.length; i++) {
             final Folder f = folders[i];
@@ -283,5 +291,26 @@ public class ParserMail {
     public static String parseName(String email) {
         String name = email.substring(0, email.indexOf("@"));
         return name;
+    }
+
+    public static List<Integer> getIdFolders(final SQLiteDatabase sdb, Folder[] folders, final int mailBoxCode){
+        final List<Integer> ids = new ArrayList<>();
+        List<Thread> threads = new ArrayList<>();
+        for (final Folder f : folders){
+            final Thread thread = new Thread(new Runnable() {
+                public void run() {
+                    int idFolder = MailFolder.selectFolderByNameAndMailBoxCode(sdb, f.getName(), mailBoxCode);
+                    ids.add(idFolder);
+                }});
+            thread.start();
+            threads.add(thread);
+        }
+        for (Thread thread : threads)
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        return ids;
     }
 }
