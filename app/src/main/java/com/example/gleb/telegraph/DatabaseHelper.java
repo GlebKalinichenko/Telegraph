@@ -3,6 +3,7 @@ package com.example.gleb.telegraph;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Build;
 
 /**
  * Created by Gleb on 29.12.2015.
@@ -100,6 +101,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String CREATE_FOLDER_NAME_INDEX = "CREATE INDEX FolderNameIndex " +
             "ON Folders(NameFolder);";
 
+    public static final String CREATE_FOLDER_MAIL_BOX_CODE_INDEX = "CREATE INDEX FolderMailBoxCodeIndex " +
+            "ON Folders(MailBoxCode);";
+
     public static final String CREATE_MAIL_BOX_EMAIL_INDEX = "CREATE INDEX MailBoxEmailIndex " +
             "ON MailBoxes(Email);";
 
@@ -172,6 +176,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     @Override
+    public void onConfigure(SQLiteDatabase db) {
+        super.onConfigure(db);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            db.setForeignKeyConstraintsEnabled(true);
+        }
+    }
+
+//    @Override
+//    public void onOpen(SQLiteDatabase db) {
+//        super.onOpen(db);
+//        db.execSQL("PRAGMA foreign_keys=ON;");
+//    }
+
+    @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("PRAGMA foreign_keys=ON;");
         db.execSQL(CREATE_MAIL_BOXES);
@@ -180,6 +198,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_FOLDERS);
         db.execSQL(CREATE_MAILS);
         db.execSQL(CREATE_FOLDER_NAME_INDEX);
+        db.execSQL(CREATE_FOLDER_MAIL_BOX_CODE_INDEX);
         db.execSQL(CREATE_USERS);
         db.execSQL(CREATE_ATTACHS);
         db.execSQL(CREATE_USER_KEYS);
