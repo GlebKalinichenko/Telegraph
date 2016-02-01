@@ -174,12 +174,17 @@ public class SignInActivity extends AbstractActivity {
             if (session != null) {
                 isAuthentication = true;
                 SQLiteDatabase sdb = databaseHelper.getWritableDatabase();
-                //add information about account to database
-                mailBox.addAccount(sdb);
-                //get last id of account
+                //get id of mail box account
+                int mailBoxCode = MailBox.getAccountByName(databaseHelper.getReadableDatabase(),
+                        mailBox.getEmail());
+                //is empty account
+                if (mailBoxCode == 0) {
+                    //add information about account to database
+                    mailBoxCode = (int) mailBox.addAccount(sdb);
+                }
                 SQLiteDatabase db = databaseHelper.getReadableDatabase();
                 //add mail settings to database
-                mailSettings.addSettings(sdb, MailBox.getLastAccount(db));
+                mailSettings.addSettings(sdb, mailBoxCode);
                 db.close();
                 sdb.close();
             } else
