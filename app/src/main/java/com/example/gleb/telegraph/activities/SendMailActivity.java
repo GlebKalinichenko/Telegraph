@@ -78,7 +78,7 @@ public class SendMailActivity extends AbstractActivity {
                 sendMailContext = new SendMailContext(new SendUsualMail());
                 sendMailContext.executeSendMail(subjectEditText.getText().toString(),
                         messageEditText.getText().toString(),
-                        new String[]{receiversEditText.getText().toString()}, false, false,
+                        splitEmails(receiversEditText.getText().toString()), false, false,
                         mailSettings, mailBox, pathFiles);
             }
         });
@@ -106,7 +106,8 @@ public class SendMailActivity extends AbstractActivity {
                         @Override
                         public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
                             MaterialSimpleListItem item = adapter.getItem(which);
-                            receiversEditText.setText(item.getContent());
+                            receiversEditText.setText(receiversEditText.getText().toString() +
+                                    item.getContent() + ",");
                         }
                     }).negativeText(R.string.cancel).positiveText(R.string.ok)
                     .show();
@@ -149,6 +150,15 @@ public class SendMailActivity extends AbstractActivity {
         databaseHelper = new DatabaseHelper(SendMailActivity.this);
         pathFiles = new ArrayList<>();
         headerAttachFiles = new ArrayList<>();
+    }
+
+    /**
+     * Split enum of emails to send mail
+     * @param String        Array of emails to send mails
+     * @return String[]     Array of emails
+     * */
+    private String[] splitEmails(String emails){
+        return emails.split(",");
     }
 
     @Override

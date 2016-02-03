@@ -40,12 +40,12 @@ public class MailBox implements Serializable {
      * @param SQLiteDatabase        Database
      * @return void
      * */
-    public void addAccount(SQLiteDatabase sdb){
+    public long addAccount(SQLiteDatabase sdb){
         ContentValues values = new ContentValues();
         values.put(DatabaseHelper.EMAIL_ACCOUNT, this.email);
         values.put(DatabaseHelper.PASSWORD_ACCOUNT, this.password);
         values.put(DatabaseHelper.RECEIVE_PROTOCOL, this.receiveProtocol);
-        sdb.insert(DatabaseHelper.TABLE_MAIL_BOXES, null, values);
+        return sdb.insert(DatabaseHelper.TABLE_MAIL_BOXES, null, values);
     }
 
     /**
@@ -59,6 +59,21 @@ public class MailBox implements Serializable {
         cursor.moveToLast();
         int boxCode = cursor.getInt(0);
         return boxCode;
+    }
+
+    /**
+     * Get index of inserted account in table mail box by email of account
+     * @param SQLiteDatabase        Database
+     * @param String                Email of account
+     * @return int                  Index of inserted account
+     * */
+    public static int getAccountByName(SQLiteDatabase sdb, String email){
+        String query = "SELECT IdMailBox from MailBoxes where Email='" + email + "'";
+        Cursor cursor = sdb.rawQuery(query, null);
+        if (cursor != null && cursor.moveToFirst())
+            return cursor.getInt(0);
+        else
+            return 0;
     }
 
     public String getEmail() {

@@ -1,8 +1,6 @@
 package com.example.gleb.telegraph;
 
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteStatement;
 
 import com.example.gleb.telegraph.models.Attach;
 import com.example.gleb.telegraph.models.Mail;
@@ -36,10 +34,15 @@ import javax.mail.search.FlagTerm;
 public class ParserMail {
     private String emailReceiver;
     private DatabaseHelper databaseHelper;
+    private int curOffsetMails;
+    private int prevOffsetMails;
 
-    public ParserMail(String emailReceiver, DatabaseHelper databaseHelper) {
+    public ParserMail(String emailReceiver, DatabaseHelper databaseHelper, int curOffsetMails,
+        int prevOffsetMails) {
         this.emailReceiver = emailReceiver;
         this.databaseHelper = databaseHelper;
+        this.curOffsetMails = curOffsetMails;
+        this.prevOffsetMails = prevOffsetMails;
     }
 
     /**
@@ -48,7 +51,12 @@ public class ParserMail {
      * @return void
      * */
     public void parseFolder(Folder[] folders) throws MessagingException, IOException {
-        final List<Integer> ids = MailFolder.addFolders(databaseHelper, folders);
+        //id of email account
+        int mailBoxCode = MailBox.getAccountByName(databaseHelper.getReadableDatabase(), emailReceiver);
+        //list of id folders for email account
+        List<Integer> idFolders = MailFolder.getIdFolders(databaseHelper.getReadableDatabase(), folders, mailBoxCode);
+        //id of inserted mails
+        final List<Integer> ids = MailFolder.addFolders(databaseHelper, folders, mailBoxCode, idFolders);
         final List<Thread> threads = new ArrayList<>();
         for (int i = 0; i < folders.length; i++) {
             final Folder f = folders[i];
@@ -59,6 +67,9 @@ public class ParserMail {
                         f.open(Folder.READ_ONLY);
                         FlagTerm ft = new FlagTerm(new Flags(Flags.Flag.USER), false);
                         Message[] messages = f.search(ft);
+                        //check is inbox folder for save current num of mails to application
+                        if (isInboxMessages(f.getName()))
+                            MessageApplication.setNumMessage(messages.length);
                         if (messages.length != 0)
                             parsePostMessage(messages, ids.get(finalI));
                     } catch (MessagingException e) {
@@ -85,7 +96,7 @@ public class ParserMail {
      * @param Message[]        Array of message from post server
      * @return void
      * */
-    private synchronized void parsePostMessage(Message[] messages, int folderCode) throws MessagingException, IOException {
+    public synchronized void parsePostMessage(Message[] messages, int folderCode) throws MessagingException, IOException {
         List<Mail> mails = new ArrayList<>();
         List<Long> usersCode = new ArrayList<>();
         List<Integer> foldersCode = new ArrayList<>();
@@ -98,8 +109,8 @@ public class ParserMail {
         int hasAttach = 0;
         Mail mail;
 
-        if (messages.length > 5) {
-            for (int i = messages.length - 1; i > messages.length - 5; i--) {
+        if (messages.length > 5 * curOffsetMails) {
+            for (int i = messages.length - 1 - 5 * prevOffsetMails; i > messages.length - 5 * curOffsetMails; i--) {
                 emailSender = parseEmailAddress(messages[i]);
                 nameSender = parseNameEmail(messages[i]);
                 date = parseDate(messages[i]);
@@ -283,5 +294,18 @@ public class ParserMail {
     public static String parseName(String email) {
         String name = email.substring(0, email.indexOf("@"));
         return name;
+    }
+
+    /**
+     * Check is current folder is inbox for save num of mails to equals
+     * @param String         Name of folder
+     * @param int            Num of messages of current folder
+     * @return void
+     * */
+    public static boolean isInboxMessages(String folder){
+        if (folder.toLowerCase().contains("inbox") || folder.toLowerCase().contains("входящие"))
+            return true;
+        else
+            return false;
     }
 }
