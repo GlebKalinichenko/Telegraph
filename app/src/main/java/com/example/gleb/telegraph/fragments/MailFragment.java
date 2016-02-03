@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.gleb.telegraph.DatabaseHelper;
 import com.example.gleb.telegraph.activities.ItemMailActivity;
 import com.example.gleb.telegraph.RecyclerClickListener;
 import com.example.gleb.telegraph.models.MailBox;
@@ -25,21 +26,28 @@ import java.util.List;
  * Created by gleb on 20.01.16.
  */
 public class MailFragment extends AbstractFragment {
+    public static final String FRAGMENT_FOLDER = "FragmentFolder";
+    public static final String FRAGMENT_MAIL_BOX = "FragmentMailBox";
     private String folder;
     private SQLiteDatabase sdb;
     private List<Mail> mails;
     private MailBox mailBox;
 
-    public MailFragment(String folder, SQLiteDatabase sdb, MailBox mailBox) {
-        this.folder = folder;
-        this.sdb = sdb;
-        this.mailBox = mailBox;
-        this.mails = new ArrayList<>();
+    public static MailFragment newInstance(String folder, MailBox mailBox) {
+        Bundle args = new Bundle();
+        args.putString(FRAGMENT_FOLDER, folder);
+        args.putSerializable(FRAGMENT_MAIL_BOX, mailBox);
+        MailFragment fragment = new MailFragment();
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        sdb = new DatabaseHelper(getContext()).getReadableDatabase();
+        mailBox = (MailBox) getArguments().getSerializable(FRAGMENT_MAIL_BOX);
+        folder = getArguments().getString(FRAGMENT_FOLDER);
         View v = initializeWidgets(inflater, container);
         LinearLayoutManager llm = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(llm);
