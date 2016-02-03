@@ -68,7 +68,8 @@ public class ParserMail {
                         FlagTerm ft = new FlagTerm(new Flags(Flags.Flag.USER), false);
                         Message[] messages = f.search(ft);
                         //check is inbox folder for save current num of mails to application
-                        isInboxMessages(f.getName(), messages.length);
+                        if (isInboxMessages(f.getName()))
+                            MessageApplication.setNumMessage(messages.length);
                         if (messages.length != 0)
                             parsePostMessage(messages, ids.get(finalI));
                     } catch (MessagingException e) {
@@ -95,7 +96,7 @@ public class ParserMail {
      * @param Message[]        Array of message from post server
      * @return void
      * */
-    private synchronized void parsePostMessage(Message[] messages, int folderCode) throws MessagingException, IOException {
+    public synchronized void parsePostMessage(Message[] messages, int folderCode) throws MessagingException, IOException {
         List<Mail> mails = new ArrayList<>();
         List<Long> usersCode = new ArrayList<>();
         List<Integer> foldersCode = new ArrayList<>();
@@ -301,8 +302,10 @@ public class ParserMail {
      * @param int            Num of messages of current folder
      * @return void
      * */
-    public static void isInboxMessages(String folder, int numMessages){
+    public static boolean isInboxMessages(String folder){
         if (folder.toLowerCase().contains("inbox") || folder.toLowerCase().contains("входящие"))
-            MessageApplication.setNumMessage(numMessages);
+            return true;
+        else
+            return false;
     }
 }
