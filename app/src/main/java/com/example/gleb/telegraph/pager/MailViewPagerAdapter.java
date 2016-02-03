@@ -4,25 +4,27 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.util.ArrayMap;
+import android.view.ViewGroup;
 
 import com.example.gleb.telegraph.fragments.MailFragment;
 import com.example.gleb.telegraph.models.MailBox;
 import com.example.gleb.telegraph.models.MailFolder;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by gleb on 20.01.16.
  */
 public class MailViewPagerAdapter extends FragmentStatePagerAdapter {
-    private SQLiteDatabase sdb;
     private List<String> folders;
     private MailBox mailBox;
 
-    public MailViewPagerAdapter(FragmentManager fm, List<String> folders, SQLiteDatabase sdb, MailBox mailBox) {
+    public MailViewPagerAdapter(FragmentManager fm, List<String> folders, MailBox mailBox) {
         super(fm);
         this.folders = folders;
-        this.sdb = sdb;
         this.mailBox = mailBox;
     }
 
@@ -33,7 +35,7 @@ public class MailViewPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        MailFragment mailFragment = new MailFragment(folders.get(position), sdb, mailBox);
+        MailFragment mailFragment = MailFragment.newInstance(folders.get(position), mailBox);
         return mailFragment;
     }
 
