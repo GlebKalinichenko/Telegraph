@@ -23,7 +23,9 @@ import com.example.gleb.telegraph.DatabaseHelper;
 import com.example.gleb.telegraph.MailService;
 import com.example.gleb.telegraph.ParserMail;
 import com.example.gleb.telegraph.R;
+import com.example.gleb.telegraph.events.ReceiveMailEvent;
 import com.example.gleb.telegraph.abstracts.AbstractActivity;
+import com.example.gleb.telegraph.fragments.MailFragment;
 import com.example.gleb.telegraph.properties.FactoryProperties;
 import com.example.gleb.telegraph.models.MailBox;
 import com.example.gleb.telegraph.models.MailFolder;
@@ -46,6 +48,8 @@ import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.internet.AddressException;
 
+import de.greenrobot.event.EventBus;
+
 /**
  * Created by Gleb on 03.01.2016.
  */
@@ -65,6 +69,7 @@ public class TelegraphActivity extends AbstractActivity {
     private SharedPreferences settings;
     private int curOffsetMails;
     private int prevOffsetMails;
+    private Folder[] folders;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +95,7 @@ public class TelegraphActivity extends AbstractActivity {
                 startActivity(intent);
             }
         });
+        EventBus.getDefault().register(this);
         new Loader(mailBox, mailSettings).execute();
     }
 
@@ -204,7 +210,7 @@ public class TelegraphActivity extends AbstractActivity {
      * */
     private void initializeViewPager(List<String> folders){
         viewPagerAdapter = new MailViewPagerAdapter(getSupportFragmentManager(), folders,
-                databaseHelper.getReadableDatabase(), mailBox);
+                mailBox);
         viewPager.setAdapter(viewPagerAdapter);
         tabs.setDistributeEvenly(true);
         tabs.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
@@ -279,7 +285,6 @@ public class TelegraphActivity extends AbstractActivity {
         private Session session;
         private Properties props;
         private Store store;
-        private Folder[] folders;
 
         public Loader(MailBox mailBox, MailSettings mailSettings) {
             this.mailSettings = mailSettings;
@@ -328,7 +333,26 @@ public class TelegraphActivity extends AbstractActivity {
                     + String.valueOf(endtime - startTime), Toast.LENGTH_LONG).show();
             progressView.setVisibility(View.INVISIBLE);
             initializeViewPager(MailFolder.folderToString(folders));
-            startService(new Intent(TelegraphActivity.this, MailService.class));
+            Intent intent = new Intent(TelegraphActivity.this, MailService.class);
+            intent.putExtra(MailService.MAIL_BOX, mailBox);
+            intent.putExtra(MailService.MAIL_SETTINGS, mailSettings);
+            intent.putExtra(MailService.CUR_OFFSET_MAILS, curOffsetMails);
+            intent.putExtra(MailService.PREV_OFFSET_MAILS, prevOffsetMails);
+            startService(intent);
         }
+    }
+
+    /**
+     * Handle for receive mails from service
+     * @param ReceiveMail        Receive mail
+     * @return void
+     * */
+    public void onEvent(ReceiveMailEvent event){
+        MailViewPagerAdapter adapter = (MailViewPagerAdapter) viewPager.getAdapter();
+        MailFragment fragment = (MailFragment) adapter.instantiateItem(viewPager, viewPager.getCurrentItem());
+        getSupportFragmentManager().beginTransaction().detach(fragment).attach(fragment).commit();
+//        adapter.startUpdate(viewPager);
+//        adapter.finishUpdate(viewPager);
+//        adapter.notifyDataSetChanged();
     }
 }
