@@ -25,6 +25,7 @@ import com.example.gleb.telegraph.ParserMail;
 import com.example.gleb.telegraph.R;
 import com.example.gleb.telegraph.events.ReceiveMailEvent;
 import com.example.gleb.telegraph.abstracts.AbstractActivity;
+import com.example.gleb.telegraph.events.SendMailEvent;
 import com.example.gleb.telegraph.fragments.MailFragment;
 import com.example.gleb.telegraph.properties.FactoryProperties;
 import com.example.gleb.telegraph.models.MailBox;
@@ -263,7 +264,8 @@ public class TelegraphActivity extends AbstractActivity {
         List<String> folders = MailFolder.selectFolders(sdb);
         MailFolder.removeFoldersByMailCode(sdb, MailBox.getAccountByName(sdb, mailBox.getEmail()));
         folders = MailFolder.selectFolders(sdb);
-        int value = folders.size();
+        Intent intent = new Intent(TelegraphActivity.this, MailService.class);
+        stopService(intent);
     }
 
     @Override
@@ -348,9 +350,22 @@ public class TelegraphActivity extends AbstractActivity {
      * @return void
      * */
     public void onEvent(ReceiveMailEvent event){
+        refreshFragment();
+    }
+
+    /**
+     * Handle for receive mails from service
+     * @param ReceiveMail        Receive mail
+     * @return void
+     * */
+    public void onEvent(SendMailEvent event){
+        refreshFragment();
+    }
+
+    private void refreshFragment(){
         MailViewPagerAdapter adapter = (MailViewPagerAdapter) viewPager.getAdapter();
         MailFragment fragment = (MailFragment) adapter.instantiateItem(viewPager, viewPager.getCurrentItem());
-        getSupportFragmentManager().beginTransaction().detach(fragment).attach(fragment).commit();
+        getSupportFragmentManager().beginTransaction().detach(fragment).attach(fragment).commitAllowingStateLoss();
 //        adapter.startUpdate(viewPager);
 //        adapter.finishUpdate(viewPager);
 //        adapter.notifyDataSetChanged();
