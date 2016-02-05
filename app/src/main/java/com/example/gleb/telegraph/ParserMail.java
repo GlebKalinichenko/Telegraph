@@ -68,7 +68,7 @@ public class ParserMail {
                         FlagTerm ft = new FlagTerm(new Flags(Flags.Flag.USER), false);
                         Message[] messages = f.search(ft);
                         //check is inbox folder for save current num of mails to application
-                        if (isInboxMessages(f.getName()))
+                        if (MailFolder.isInboxMessages(f.getName()))
                             MessageApplication.setNumMessage(messages.length);
                         if (messages.length != 0)
                             parsePostMessage(messages, ids.get(finalI));
@@ -176,7 +176,7 @@ public class ParserMail {
      * @param Message        Message with email of sender
      * @return String        Email of sender
      * */
-    private String parseEmailAddress(Message message) throws MessagingException, UnsupportedEncodingException {
+    public static String parseEmailAddress(Message message) throws MessagingException, UnsupportedEncodingException {
         String email = "";
         Address[] in = message.getFrom();
         for (Address address : in) {
@@ -190,7 +190,7 @@ public class ParserMail {
      * @param Message        Message with name of sender
      * @return String        Name of sender
      * */
-    private String parseNameEmail(Message message) throws MessagingException, UnsupportedEncodingException {
+    public static String parseNameEmail(Message message) throws MessagingException, UnsupportedEncodingException {
         String name = "";
         Address[] in = message.getFrom();
         for (Address address : in) {
@@ -204,7 +204,7 @@ public class ParserMail {
      * @param Message        Message with mail from post server
      * @return String        Send date of mail
      * */
-    private String parseDate(Message message) throws MessagingException, UnsupportedEncodingException {
+    public static String parseDate(Message message) throws MessagingException, UnsupportedEncodingException {
         String date = "";
         String[] parts = message.getSentDate().toString().split(" ");
         date = String.valueOf(parts[3] + message.getSentDate().getDate()) + "."
@@ -218,7 +218,7 @@ public class ParserMail {
      * @param Message        Subject of mail from post server
      * @return String        Subject of mail
      * */
-    private String parseSubject(Message message) throws MessagingException, UnsupportedEncodingException {
+    public static String parseSubject(Message message) throws MessagingException, UnsupportedEncodingException {
         String subject = "";
         subject = message.getSubject();
         return subject;
@@ -229,7 +229,7 @@ public class ParserMail {
      * @param Object         Content object
      * @return String        Content body of mail
      * */
-    private String parseContentString(Object content) throws MessagingException, UnsupportedEncodingException {
+    public static String parseContentString(Object content) throws MessagingException, UnsupportedEncodingException {
         String body = "";
         body = (String) content;
         return body;
@@ -240,7 +240,7 @@ public class ParserMail {
      * @param Object         Content object
      * @return String        Content body of mail
      * */
-    private String parseContentMultipart(Object content) throws MessagingException, IOException {
+    public static String parseContentMultipart(Object content) throws MessagingException, IOException {
         String body = "";
         Multipart mp = (Multipart) content;
         BodyPart bp = mp.getBodyPart(0);
@@ -253,7 +253,7 @@ public class ParserMail {
      * @param Multipart        Body of mail
      * @return void
      * */
-    private int parseMultipartAttach(Multipart content) throws MessagingException, IOException {
+    public static int parseMultipartAttach(Multipart content) throws MessagingException, IOException {
         int hasAttach = 0;
         for (int j = 0; j < content.getCount(); j++) {
             BodyPart bodyPart = content.getBodyPart(j);
@@ -294,18 +294,5 @@ public class ParserMail {
     public static String parseName(String email) {
         String name = email.substring(0, email.indexOf("@"));
         return name;
-    }
-
-    /**
-     * Check is current folder is inbox for save num of mails to equals
-     * @param String         Name of folder
-     * @param int            Num of messages of current folder
-     * @return void
-     * */
-    public static boolean isInboxMessages(String folder){
-        if (folder.toLowerCase().contains("inbox") || folder.toLowerCase().contains("входящие"))
-            return true;
-        else
-            return false;
     }
 }
