@@ -129,6 +129,23 @@ public class MailFolder {
     }
 
     /**
+     * Select folders that has pattern of send mail in name of folder
+     * @param SQLiteDatabase        Database
+     * @return int                  Code of folder in database
+     * */
+    public static Integer selectFolderWithContainsSend(SQLiteDatabase sdb){
+        String query = "Select IdFolder from Folders where NameFolder like '%Send%' " +
+                "or NameFolder like '%Отправленные%'";
+        Cursor cursor = sdb.rawQuery(query, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            return cursor.getInt(0);
+        }
+        else {
+            return 0;
+        }
+    }
+
+    /**
      * Remove folders from database by mail box code
      * @param SQLiteDatabase        Database
      * @param int                   Code of mail box account
@@ -177,5 +194,18 @@ public class MailFolder {
                 e.printStackTrace();
             }
         return ids;
+    }
+
+    /**
+     * Check is current folder is inbox for save num of mails to equals
+     * @param String         Name of folder
+     * @param int            Num of messages of current folder
+     * @return void
+     * */
+    public static boolean isInboxMessages(String folder){
+        if (folder.toLowerCase().contains("inbox") || folder.toLowerCase().contains("входящие"))
+            return true;
+        else
+            return false;
     }
 }
