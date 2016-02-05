@@ -75,7 +75,7 @@ public class SendMailActivity extends AbstractActivity {
         sendImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendMailContext = new SendMailContext(new SendUsualMail());
+                sendMailContext = new SendMailContext(new SendUsualMail(), databaseHelper);
                 sendMailContext.executeSendMail(subjectEditText.getText().toString(),
                         messageEditText.getText().toString(),
                         splitEmails(receiversEditText.getText().toString()), false, false,
@@ -97,20 +97,7 @@ public class SendMailActivity extends AbstractActivity {
         addSenderImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final MaterialSimpleListAdapter adapter = new MaterialSimpleListAdapter(SendMailActivity.this);
-                List<User> users = User.selectUsers(databaseHelper.getReadableDatabase());
-                initializeAlertSender(users, adapter);
-                new MaterialDialog.Builder(SendMailActivity.this)
-                    .title(R.string.choose_email)
-                    .adapter(adapter, new MaterialDialog.ListCallback() {
-                        @Override
-                        public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
-                            MaterialSimpleListItem item = adapter.getItem(which);
-                            receiversEditText.setText(receiversEditText.getText().toString() +
-                                    item.getContent() + ",");
-                        }
-                    }).negativeText(R.string.cancel).positiveText(R.string.ok)
-                    .show();
+                initializeEmailAlert();
             }
         });
     }
@@ -201,5 +188,27 @@ public class SendMailActivity extends AbstractActivity {
     private void loadFileChooser(){
         Intent intent = new Intent(SendMailActivity.this, FileChooserActivity.class);
         startActivityForResult(intent, FILE_CHOOSER);
+    }
+
+    /**
+     * Show alert with emails for send mails
+     * @param void
+     * @return void
+     * */
+    private void initializeEmailAlert(){
+        final MaterialSimpleListAdapter adapter = new MaterialSimpleListAdapter(SendMailActivity.this);
+        List<User> users = User.selectUsers(databaseHelper.getReadableDatabase());
+        initializeAlertSender(users, adapter);
+        new MaterialDialog.Builder(SendMailActivity.this)
+                .title(R.string.choose_email)
+                .adapter(adapter, new MaterialDialog.ListCallback() {
+                    @Override
+                    public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
+                        MaterialSimpleListItem item = adapter.getItem(which);
+                        receiversEditText.setText(receiversEditText.getText().toString() +
+                                item.getContent() + ",");
+                    }
+                }).negativeText(R.string.cancel).positiveText(R.string.ok)
+                .show();
     }
 }
