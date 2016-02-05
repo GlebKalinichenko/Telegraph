@@ -1,11 +1,21 @@
 package com.example.gleb.telegraph.sendmail;
 
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 
+import com.example.gleb.telegraph.DatabaseHelper;
+import com.example.gleb.telegraph.ParserMail;
+import com.example.gleb.telegraph.events.ReceiveMailEvent;
+import com.example.gleb.telegraph.events.SendMailEvent;
+import com.example.gleb.telegraph.models.Mail;
+import com.example.gleb.telegraph.models.MailFolder;
+import com.example.gleb.telegraph.models.StraightIndex;
+import com.example.gleb.telegraph.models.User;
 import com.example.gleb.telegraph.properties.FactoryProperties;
 import com.example.gleb.telegraph.models.MailBox;
 import com.example.gleb.telegraph.models.MailSettings;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -15,6 +25,7 @@ import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
 import javax.mail.BodyPart;
+import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.PasswordAuthentication;
@@ -25,12 +36,15 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
+import de.greenrobot.event.EventBus;
+
 /**
  * Created by gleb on 24.01.16.
  */
 public class SendUsualMail extends javax.mail.Authenticator implements SendMailInterface {
     private MailBox mailBox;
     private List<String> attachFiles;
+    private DatabaseHelper databaseHelper;
 
     /**
      * Send usual mail
@@ -45,9 +59,11 @@ public class SendUsualMail extends javax.mail.Authenticator implements SendMailI
      * */
     @Override
     public boolean sendMail(String subject, String message, String[] receivers, boolean hasEncryption,
-        boolean hasDigest, MailSettings mailSettings, MailBox mailBox, List<String> attachFiles) {
+        boolean hasDigest, MailSettings mailSettings, MailBox mailBox, List<String> attachFiles,
+        DatabaseHelper databaseHelper) {
         this.mailBox = mailBox;
         this.attachFiles = attachFiles;
+        this.databaseHelper = databaseHelper;
         new SendUsualMailAsyncTask(mailBox, mailSettings, message, receivers, subject, attachFiles).execute();
         return true;
     }
@@ -95,6 +111,16 @@ public class SendUsualMail extends javax.mail.Authenticator implements SendMailI
                 msg = initializeMessage(multipart, session, mailBox, message, receivers, subject,
                         attachFiles);
                 Transport.send(msg);
+                //add send mail to database
+                try {
+                    addSendMail(mailBox, message, (InternetAddress[]) msg.getAllRecipients(),
+                            subject, ParserMail.parseDate(msg), new ArrayList<String>(), StraightIndex.REVERSE,
+                            databaseHelper);
+                } catch (MessagingException e) {
+                    e.printStackTrace();
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
             }
             catch(Exception e){
                 e.printStackTrace();
@@ -105,6 +131,7 @@ public class SendUsualMail extends javax.mail.Authenticator implements SendMailI
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
+            EventBus.getDefault().post(new SendMailEvent(true));
         }
     }
 
@@ -118,16 +145,17 @@ public class SendUsualMail extends javax.mail.Authenticator implements SendMailI
      * @param String        Subject of mail
      * @return MimeMessage  Initialize mime message
      * */
-    private MimeMessage initializeMessage(Multipart multipart, Session session, MailBox mailBox,
-        String message, String[] receivers, String subject, List<String> attachFiles) throws Exception {
-        MimeMessage msg = new MimeMessage(session);
+    private MimeMessage initializeMessage(Multipart multipart, Session session, final MailBox mailBox,
+        final String message, String[] receivers, final String subject, List<String> attachFiles) throws Exception {
+        final MimeMessage msg = new MimeMessage(session);
         msg.setFrom(new InternetAddress(mailBox.getEmail()));
         InternetAddress[] addressTo = new InternetAddress[receivers.length];
         for (int i = 0; i < receivers.length; i++)
             addressTo[i] = new InternetAddress(receivers[i]);
         msg.setRecipients(MimeMessage.RecipientType.TO, addressTo);
         msg.setSubject(subject);
-        msg.setSentDate(new Date());
+        final Date sendDate = new Date();
+        msg.setSentDate(sendDate);
         MimeBodyPart messageBodyPart = new MimeBodyPart();
         messageBodyPart.setText(message);
         multipart.addBodyPart(messageBodyPart);
@@ -156,5 +184,63 @@ public class SendUsualMail extends javax.mail.Authenticator implements SendMailI
     @Override
     public PasswordAuthentication getPasswordAuthentication() {
         return new PasswordAuthentication(mailBox.getEmail(), mailBox.getPassword());
+    }
+
+    /**
+     * Add send mail to database
+     * @param MailBox                Email account of mail box
+     * @param String                 Message of mail
+     * @param InternetAddress[]      Array of receivers emails
+     * @param String                 Subject of mail
+     * @param String                 Date of send mail
+     * @param List<String>           Array of attached files
+     * @param SQLiteDatabase         Database
+     * @return void
+     * */
+    private static void addSendMail(final MailBox mailBox, final String message, InternetAddress[] receivers,
+        final String subject, final String date, final List<String> attachFiles, int straightIndex,
+        final DatabaseHelper databaseHelper){
+        final List<Mail> mails = new ArrayList<>();
+        final List<Long> usersCode = new ArrayList<>();
+        final List<Integer> foldersCode = new ArrayList<>();
+        List<Thread> threads = new ArrayList<>();
+        for (final InternetAddress receiver : receivers) {
+            final Thread thread = new Thread(new Runnable() {
+                public void run() {
+                    if (attachFiles.size() != 0) {
+                        Mail mail = new Mail(receiver.getAddress(), receiver.getPersonal(), mailBox.getEmail(),
+                                subject, message, date, 1);
+                        mails.add(mail);
+                    } else {
+                        Mail mail = new Mail(receiver.getAddress(), receiver.getAddress(), mailBox.getEmail(),
+                                subject, message, date, 0);
+                        mails.add(mail);
+                    }
+                    //if user is no in table Users add it and return his index
+                    long userCode = User.checkUserEmail(databaseHelper.getReadableDatabase(),
+                            receiver.getAddress());
+                    if (userCode == 0) {
+                        User user = new User(receiver.getAddress());
+                        //add user
+                        usersCode.add(user.addUser(databaseHelper));
+                    } else
+                        //add mail at first return index user and get last folder
+                        usersCode.add(userCode);
+                    int folderCode = MailFolder.selectFolderWithContainsSend(
+                            databaseHelper.getReadableDatabase());
+                    foldersCode.add(folderCode);
+                }
+            });
+            threads.add(thread);
+            thread.start();
+        }
+        for (Thread thread : threads){
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        Mail.addMails(databaseHelper, mails, usersCode, foldersCode, straightIndex, null);
     }
 }
