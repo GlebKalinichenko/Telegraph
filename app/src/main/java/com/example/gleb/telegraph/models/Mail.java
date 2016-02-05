@@ -11,6 +11,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+
 /**
  * Created by Gleb on 30.12.2015.
  */
@@ -125,6 +128,18 @@ public class Mail implements Serializable {
         if (cursor != null && cursor.moveToFirst()) {
             do {
                 if (cursor.getInt(7) == 1) {
+                    String sender = cursor.getString(0);
+                    String namesender = cursor.getString(1);
+                    String receiver = cursor.getString(2);
+                    String subject = cursor.getString(3);
+                    String content = cursor.getString(4);
+                    String date = cursor.getString(5);
+                    int hasAttach = cursor.getInt(6);
+                    Mail mail = new Mail(sender, namesender, receiver, subject, content, date,
+                            hasAttach);
+                    mails.add(mail);
+                }
+                else {
                     String sender = cursor.getString(0);
                     String namesender = cursor.getString(1);
                     String receiver = cursor.getString(2);
