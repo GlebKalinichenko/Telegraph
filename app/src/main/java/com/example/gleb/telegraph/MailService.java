@@ -36,7 +36,6 @@ public class MailService extends Service {
     public static final String MAIL_SETTINGS = "MailSettings";
     public static final String CUR_OFFSET_MAILS = "CurOffsetMails";
     public static final String PREV_OFFSET_MAILS = "PrevOffsetMails";
-    public static final String BROADCAST_RECEIVER = "BroadcastReceiver";
     public static final long NOTIFY_INTERVAL = 10 * 1000;
     private Handler mHandler = new Handler();
     private Timer mTimer = null;
@@ -133,11 +132,12 @@ public class MailService extends Service {
                         FlagTerm ft = new FlagTerm(new Flags(Flags.Flag.USER), false);
                         messages = folders[i].search(ft);
                         //check is inbox folder for save current num of mails to application
-                        if (ParserMail.isInboxMessages(folders[i].getName())) {
+                        if (MailFolder.isInboxMessages(folders[i].getName())) {
                             folder = folders[i];
                             int oldMails = MessageApplication.getNumMessages();
                             if (oldMails < messages.length){
                                 isReceiveMails = true;
+                                //delta receive mails
                                 int receiveMails = messages.length - oldMails;
                                 MessageApplication.setNumMessage(oldMails + receiveMails);
                                 Message[] receiveMessages = getReceiveMessages(receiveMails,
@@ -148,9 +148,9 @@ public class MailService extends Service {
                                 try {
                                     parserMail.parsePostMessage(receiveMessages,
                                             MailFolder.selectFolderByNameAndMailBoxCode(
-                                                    databaseHelper.getReadableDatabase(), folder.getName(),
-                                                    MailBox.getAccountByName(databaseHelper.getReadableDatabase(),
-                                                            mailBox.getEmail())));
+                                            databaseHelper.getReadableDatabase(), folder.getName(),
+                                            MailBox.getAccountByName(databaseHelper.getReadableDatabase(),
+                                            mailBox.getEmail())));
                                 } catch (MessagingException e) {
                                     e.printStackTrace();
                                 } catch (IOException e) {
@@ -175,17 +175,17 @@ public class MailService extends Service {
             if (aBoolean){
                 Toast.makeText(getApplicationContext(), "Receive mails",
                         Toast.LENGTH_LONG).show();
-                List<Mail> mails = Mail.selectMailsByFolder(databaseHelper.getReadableDatabase(),
-                        folder.getName());
                 EventBus.getDefault().post(new ReceiveMailEvent(true));
-            }
-            else{
-                Toast.makeText(getApplicationContext(), "No receive mails",
-                        Toast.LENGTH_LONG).show();
             }
         }
     }
 
+    /**
+     * Gets mails from post server num of receive mails
+     * @param int            Num mails for receive
+     * @param Message[]      Array of general mails
+     * @return Message[]     Array received mails
+     * */
     private Message[] getReceiveMessages(int receiveMails, Message[] messages){
         List<Message> receiveMessagesList = new ArrayList<>();
         for (int i = messages.length - receiveMails; i < messages.length; i++){
