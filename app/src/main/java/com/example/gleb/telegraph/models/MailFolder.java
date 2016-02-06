@@ -199,11 +199,25 @@ public class MailFolder {
     /**
      * Check is current folder is inbox for save num of mails to equals
      * @param String         Name of folder
-     * @param int            Num of messages of current folder
+     * @param boolean        Is inbox folder
      * @return void
      * */
     public static boolean isInboxMessages(String folder){
         if (folder.toLowerCase().contains("inbox") || folder.toLowerCase().contains("входящие"))
+            return true;
+        else
+            return false;
+    }
+
+    /**
+     * Check is current folder is send for sync with post server
+     * @param Folder         Folder from post server
+     * @param boolean        Is send folder
+     * @return void
+     * */
+    public static boolean isSendFolder(Folder folder){
+        String nameFolder = folder.getName();
+        if (nameFolder.toLowerCase().contains("send") || nameFolder.toLowerCase().contains("отправленные"))
             return true;
         else
             return false;
