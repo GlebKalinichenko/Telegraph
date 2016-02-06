@@ -1,11 +1,9 @@
 package com.example.gleb.telegraph.sendmail;
 
-import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 
 import com.example.gleb.telegraph.DatabaseHelper;
 import com.example.gleb.telegraph.ParserMail;
-import com.example.gleb.telegraph.events.ReceiveMailEvent;
 import com.example.gleb.telegraph.events.SendMailEvent;
 import com.example.gleb.telegraph.models.Mail;
 import com.example.gleb.telegraph.models.MailFolder;
@@ -24,12 +22,16 @@ import java.util.Properties;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
+import javax.mail.Address;
 import javax.mail.BodyPart;
+import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
+import javax.mail.NoSuchProviderException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
+import javax.mail.Store;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
@@ -123,6 +125,63 @@ public class SendUsualMail extends javax.mail.Authenticator implements SendMailI
                 }
             }
             catch(Exception e){
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            EventBus.getDefault().post(new SendMailEvent(true));
+            new SyncSendMailAsyncTask(mailBox, mailSettings, msg).execute();
+        }
+    }
+
+    public class SyncSendMailAsyncTask extends AsyncTask<MailSettings, MailBox, String> {
+        private MailSettings mailSettings;
+        private MailBox mailBox;
+        private Session syncSession;
+        private Properties syncProps;
+        private Store syncStore;
+        private MimeMessage msg;
+
+        public SyncSendMailAsyncTask(MailBox mailBox, MailSettings mailSettings, MimeMessage msg) {
+            this.mailBox = mailBox;
+            this.mailSettings = mailSettings;
+            this.msg = msg;
+        }
+
+        @Override
+        protected String doInBackground(MailSettings... params) {
+            final FactoryProperties factoryProperties = new FactoryProperties();
+            final Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    syncProps = factoryProperties.getProperties(mailSettings, mailBox.getReceiveProtocol());
+                    syncSession = Session.getInstance(syncProps, SendUsualMail.this);
+                    syncStore = factoryProperties.authentication(syncSession, mailSettings,
+                            mailBox);
+                    try {
+                        Folder[] folders = syncStore.getDefaultFolder().list();
+                        for (Folder folder : folders){
+                            if (MailFolder.isSendFolder(folder)){
+                                folder.open(Folder.READ_WRITE);
+                                MimeMessage message = msg;
+                                folder.appendMessages(new Message[]{message});
+                                folder.close(true);
+                                syncStore.close();
+                            }
+                        }
+                    } catch (MessagingException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            thread.start();
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             return null;
