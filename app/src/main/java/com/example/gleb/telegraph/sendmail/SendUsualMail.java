@@ -3,6 +3,7 @@ package com.example.gleb.telegraph.sendmail;
 import android.os.AsyncTask;
 
 import com.example.gleb.telegraph.DatabaseHelper;
+import com.example.gleb.telegraph.syncmails.FactorySyncMails;
 import com.example.gleb.telegraph.ParserMail;
 import com.example.gleb.telegraph.events.SendMailEvent;
 import com.example.gleb.telegraph.models.Mail;
@@ -12,6 +13,7 @@ import com.example.gleb.telegraph.models.User;
 import com.example.gleb.telegraph.properties.FactoryProperties;
 import com.example.gleb.telegraph.models.MailBox;
 import com.example.gleb.telegraph.models.MailSettings;
+import com.example.gleb.telegraph.syncmails.SyncTypeMails;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -22,13 +24,9 @@ import java.util.Properties;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
-import javax.mail.Address;
 import javax.mail.BodyPart;
-import javax.mail.Folder;
-import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
-import javax.mail.NoSuchProviderException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Store;
@@ -162,20 +160,7 @@ public class SendUsualMail extends javax.mail.Authenticator implements SendMailI
                     syncSession = Session.getInstance(syncProps, SendUsualMail.this);
                     syncStore = factoryProperties.authentication(syncSession, mailSettings,
                             mailBox);
-                    try {
-                        Folder[] folders = syncStore.getDefaultFolder().list();
-                        for (Folder folder : folders){
-                            if (MailFolder.isSendFolder(folder)){
-                                folder.open(Folder.READ_WRITE);
-                                MimeMessage message = msg;
-                                folder.appendMessages(new Message[]{message});
-                                folder.close(true);
-                                syncStore.close();
-                            }
-                        }
-                    } catch (MessagingException e) {
-                        e.printStackTrace();
-                    }
+                    new FactorySyncMails().getSyncMail(syncStore, msg, SyncTypeMails.SYNC_SEND_MAIL);
                 }
             });
             thread.start();
